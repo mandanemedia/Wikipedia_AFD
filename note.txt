@@ -1,0 +1,156 @@
+check sentanses.
+Check accuracy for 200 AFD
+http://localhost/AFDVizualization/parseAFD_CommentLink.php?fromID=1&toID=200
+
+create a new class DetectNegative
+//$commentLink->link_Negative =  Furtehr Investigation 
+A1-Pass
+B1- fail
+B2 - //http://www.grammarly.com/handbook/sentences/negatives/
+https://docs.google.com/document/d/1F-ZN5WRek29R-BvRf-9iigcXO7D03qPx7AvhuNoEc00/edit?hl=en
+
+Create proceduer to create user table
+study the PHP NLP
+summerize the two other papers, first look at the the template part, it might be prepared before.
+
+1. ------------ parseDebateDateByID 
+http://localhost/AFDVizualization/parseDebateDateByID.php?id=123 (Next)
+
+Clear database before Parse AFD Errors: (Or alternatively could be flag as do not parse) 
+A. select * from afd where AFDHTML like "%boilerplate%boilerplate%"
+B. Find AFDID http://localhost/AFDVizualization/parseAFDByAFDID.php?AFDID=AFDID
+C. Open URL and Copy HTML Part
+D. Replace AFDHTML with new html get from URL
+E. Double check the link at http://localhost/AFDVizualization/parseAFDByAFDID.php?AFDID=AFDID
+
+2. ------------Parse AFD
+http://localhost/AFDVizualization/parseAFD.php?fromID=0001&toID=1000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=1000&toID=2000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=2000&toID=3000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=3000&toID=4000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=4000&toID=5000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=5000&toID=6000 ( done )
+http://localhost/AFDVizualization/parseAFD.php?fromID=6000&toID=7058 ( done )
+
+3. ------------Parse AFD - EndResult
+http://localhost/AFDVizualization/parseAFD_EndResult.php?fromID=0001&toID=3000   ( done )
+http://localhost/AFDVizualization/parseAFD_EndResult.php?fromID=3000&toID=6000   ( done )
+http://localhost/AFDVizualization/parseAFD_EndResult.php?fromID=6000&toID=7058   ( done )
+
+4. ------------Parse AFD - MainComment
+http://localhost/AFDVizualization/parseAFD_MainComment.php?fromID=0001&toID=3000 ( done )
+http://localhost/AFDVizualization/parseAFD_MainComment.php?fromID=3000&toID=6000 ( done )
+http://localhost/AFDVizualization/parseAFD_MainComment.php?fromID=6000&toID=7058 ( done ) 
+
+5. ------------Parse AFD - OtherComment
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=0001&toID=1000 ( done ) 
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=1001&toID=1950 ( done ) 
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=1951&toID=2550 ( done ) 
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=2551&toID=3000 ( done )
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=3001&toID=5000 ( current )
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=5001&toID=6000
+http://localhost/AFDVizualization/parseAFD_OtherComment.php?fromID=6001&toID=7058
+
+5. ------------Parse AFD - OtherComment LINK
+http://localhost/AFDVizualization/parseAFD_CommentLink.php?fromID=1&toID=2500
+http://localhost/AFDVizualization/parseAFD_CommentLink.php?fromID=2501&toID=5000
+http://localhost/AFDVizualization/parseAFD_CommentLink.php?fromID=5000&toID=7058
+
+********************************** 
+********************************** 
+********************************** 
+********************************** 
+select *
+from afd
+INNER JOIN debatedatelist 
+on debatedatelist.debateDateListID = afd.debateDateListID
+and totalAFDTable < totalAFD_inDB
+GROUP BY afd.debateDateListID;
+
+********************************** 
+select *
+from afd
+where afd.debateDateListID = 31;
+
+********************************** find a list of afd on a specific debatedatelist with No start from 1
+SET @rownr=0;
+SELECT @rownr:=@rownr+1 AS rowNumber, AFDTitle, AFDID, debatedatelistID
+FROM afd
+where afd.debateDateListID = 19;
+
+********************************** Reset  ***********
+UPDATE debatedatelist
+SET html_tableOfContent='', totalAFDContent='0', totalAFDTable='0', totalAFD_inDB='0';
+
+ALTER TABLE afd AUTO_INCREMENT = 1;
+delete from afd;
+
+********************************** Delete Comment  ***********
+delete from `comment`;
+ALTER TABLE `comment` AUTO_INCREMENT = 1;
+
+********************************** Find douplicate value in AFD 
+SELECT AFDID, AFDTitle, AFDURL, AFDHTML, flag_otherComment_empty, COUNT(*)
+FROM afd
+GROUP BY AFDTitle
+HAVING  COUNT(*) > 1
+
+********************************** Empty AFDHTML
+select *
+from afd
+where  TRIM(AFDHTML) = '' 
+
+********************************** different articles
+select *
+from afd
+where flag_error='check'
+
+********************************** AFD does not have b
+select *
+from afd
+where endResult_Html not like "%<b>%";
+
+********************************** AFD does not have UTC 
+select *
+from afd
+where endResult_Html not like "%UTC%";
+
+********************************** 1- Set flag for to do not parse AFD
+update afd
+set flag_DoNotParse = 1
+where parse_endResult_e != 1 AND
+flag_toBeRemoved != 1;
+
+********************************** 2- Set flag for to do not parse AFD
+update afd
+set flag_DoNotParse = 1 
+where endResult_Html not like "%The result was%";
+
+********************************** field that cause to not visualize AFD
+parse_endResult_s = 0
+parse_endResult_e = 0
+parse_endResult_details = 0
+flag_DoNotParse = 1
+flag_toBeRemoved = 1
+flag_DoNotVisualize = 1
+
+********************************** query condition in the where section
+and parse_endResult_s = 1
+and parse_endResult_e = 1
+and parse_endResult_details = 1
+and flag_DoNotParse = 0
+and flag_toBeRemoved = 0
+and flag_DoNotVisualize = 0
+
+********************************** endResult details does not parsed fully
+Select * 
+from afd
+where parse_endResult_details is NULL
+and flag_DoNotParse is NULL 
+and AFDID<3001
+
+
+http://web-developer-thing.blogspot.ca/2010/02/php-simple-html-dom-parser-makes.html
+http://simplehtmldom.sourceforge.net/manual.htm
+http://php.net/manual/en/regex.examples.php
+http://regexone.com/cheatsheet

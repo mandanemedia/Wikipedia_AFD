@@ -1,0 +1,40 @@
+.good{
+    color:#00CC00;
+}
+.bad{
+    color:#FF3300;
+}
+.endCall{
+    color:#996600;
+}
+.startCall{
+    color:#336699;
+}
+.percentage{
+    color:#FFCC00;
+    padding: 0;
+    margin: 0;
+    clear:both;
+}
+
+.newFunction{
+    background-color:green;
+    color: white;
+    border-style: inset;
+    border-color: yellow;
+    padding: 10px;
+}
+body{
+    background-color:black;
+    color:white;
+}
+a:visited,
+a{
+    color:#00FFFF;
+}
+.errorCheck{
+    background-color:red;
+    border-style: inset;
+    border-color: yellow;
+    padding: 3px;
+}  

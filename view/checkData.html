@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <style>
+            .chart div {
+                font: 10px sans-serif;
+                background-color: steelblue;
+                text-align: right;
+                padding: 3px;
+                margin: 1px;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+    <h3 id="loadingMessage" >Please wait, it is loading....</h3>
+    <div id="option">
+        <!--input name="updateButton" type="button" value="Update" onclick="updateData();"/-->
+    </div>
+    <div class="chart"></div>
+    <script>
+			var data1 = [];
+            getData();
+            
+            function getData()
+            {
+                d3.json("data1.php", function(error, data) {
+                    data.forEach(function(d) {
+                        data1.push(d.counter);
+                    });
+                    var loadingMessage = document.getElementById( 'loadingMessage' );
+                    loadingMessage.parentNode.removeChild( loadingMessage );
+                    updateData();
+                });
+            }
+            
+            function updateData()
+            {
+                d3.select("body").selectAll("p")
+                .data(data1)
+                .enter().append("p")
+                .text(function(d) { return "I\'m number " + d + "!"; });
+            }
+        </script>
+    </body>
+</html>
