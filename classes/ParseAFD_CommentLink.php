@@ -63,7 +63,7 @@ class ParseAFD_CommentLink{
     
     function ParseAFD_CommentLink_Content()
     {
-        //$GLOBALS['log'] .= "<br/> <span class='startCall'> ****************** Call ParseAFD_CommentLink->ParseAFD_CommentLink_Content() <a target='_blank' <a href='getAFDHtmlByID.php?id=".$this->afd->AFDID."#".$this->afd->AFDTitleID."'>". $this->afd->AFDTitle."</a> </span>";
+        $GLOBALS['log'] .= "<br/> <span class='startCall'> ****************** Call ParseAFD_CommentLink->ParseAFD_CommentLink_Content() <a target='_blank' <a href='getAFDHtmlByID.php?id=".$this->afd->AFDID."#".$this->afd->AFDTitleID."'>". $this->afd->AFDTitle."</a> </span>";
         try{
             if (!$this->afd)  
                 throw new Exception('this->afd is empty!');
@@ -74,13 +74,13 @@ class ParseAFD_CommentLink{
                 CommentLink::removedAllCommentLink_ByAFDID($this->afd->AFDID);
                 
                 //1. check endResult -2
-                //$endResult_Links = $this->check_link($this->afd->endResult_Note, -2 , $this->afd->endResult_DateTime);
-                //$this->storeInDB(-2, $endResult_Links, $this->afd->endResult_User, $this->afd->endResult_DateTime);
+                $endResult_Links = $this->check_link($this->afd->endResult_Note, -2 , $this->afd->endResult_DateTime);
+                $this->storeInDB(-2, $endResult_Links, $this->afd->endResult_User, $this->afd->endResult_DateTime);
                 
                 
                 //2. check MainComment -1
-                //$mainComment_Links = $this->check_link($this->afd->mainComment_Note, -1 , $this->afd->mainComment_DateTime);
-                //$this->storeInDB(-1, $mainComment_Links, $this->afd->mainComment_User, $this->afd->mainComment_DateTime);
+                $mainComment_Links = $this->check_link($this->afd->mainComment_Note, -1 , $this->afd->mainComment_DateTime);
+                $this->storeInDB(-1, $mainComment_Links, $this->afd->mainComment_User, $this->afd->mainComment_DateTime);
                 
                 //3. check OtherComment.. commentID
                 foreach($this->afd_Comments as $afd_comments_each)
@@ -89,8 +89,9 @@ class ParseAFD_CommentLink{
                     //it baypass the the relisted type that in (comment_Type=0)
                     if( $afd_comments_each->comment_Type != 0)
                     {
-                        $comment_Html_NoSigniture = substr($afd_comments_each->comment_Html, 0 , $afd_comments_each->comment_UserPosition - 9 ); // <a href=
-                        
+                        //$comment_Html_NoSigniture = substr($afd_comments_each->comment_Html, 0 , $afd_comments_each->comment_UserPosition -20  ); // <a href=
+                        $comment_Html_NoSigniture = $afd_comments_each->comment_Note;
+                        //$GLOBALS['log'] .= "<br/><br/><span> xxx ".$afd_comments_each->comment_Note." L:".strlen($afd_comments_each->comment_Note). " yyyy </span><br/>";
                         $otherComment_Links = $this->check_link($comment_Html_NoSigniture, $afd_comments_each->commentID , $afd_comments_each->comment_DateTime);
                         $this->storeInDB($afd_comments_each->commentID, $otherComment_Links, $afd_comments_each->comment_User, $afd_comments_each->comment_DateTime);
                     }
@@ -129,12 +130,14 @@ class ParseAFD_CommentLink{
             //Polarity
             $commentLink->link_Sentance = ParseAFD_CommentPolarity::seprateSentenceByPositionID($mainComment_EachLink[9], $commentLink->link_URLPosition, $commentLink->link_URL);                                    
             $commentLink->giveComment_Html = $mainComment_EachLink[9];
-            $polarity = ParseAFD_CommentPolarity::polarity($commentLink->giveComment_Html);
+            //$GLOBALS['log'] .= "<br/><br/><span> xxx ".$commentLink->link_Sentance." L:".strlen($commentLink->link_Sentance). " yyyy </span><br/>";
+            $polarity = ParseAFD_CommentPolarity::polarity($commentLink->link_Sentance);
             $commentLink->link_PolarityGrade = $polarity[0];
             $commentLink->link_PolarityKeyword = $polarity[1];
             
             $commentLink->update_CommentLink();
         }
+        $GLOBALS['log'] .= "<hr/>";
     }
     private function check_link($givenSentance, $commentID, $link_DateTime)
     {   

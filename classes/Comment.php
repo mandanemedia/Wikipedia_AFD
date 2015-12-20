@@ -58,8 +58,8 @@ class Comment {
     }
     
    function __destruct() {
-        if(is_resource($this->conn))
-            mysqli_close($this->conn);
+        //if(is_resource($this->conn))
+//            mysqli_close($this->conn);
    }
    
     //could be optimize by passing another boolean argument and limit the variable

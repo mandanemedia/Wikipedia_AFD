@@ -39,7 +39,7 @@ class Crawler {
         $this->insterCrawlerToDB($conn);
         $GLOBALS['log'] .= "<br/>*********";
         
-        mysqli_close($conn);
+        //mysqli_close($conn);
         
         return $this->html;
     }
@@ -80,7 +80,7 @@ class Crawler {
             {
                 throw new Exception('There is record in DB!');
             }
-            mysqli_close($conn);
+            //mysqli_close($conn);
         }   
         catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -122,7 +122,7 @@ class Crawler {
             {
                 throw new Exception('There is record in DB!');
             }
-            mysqli_close($conn);
+            //mysqli_close($conn);
         }   
         catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -165,7 +165,7 @@ class Crawler {
             {
                 throw new Exception('There is record in DB!');
             }
-            mysqli_close($conn);
+            //mysqli_close($conn);
         }   
         catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -275,7 +275,7 @@ class Crawler {
         // Create connection
         $conn = new mysqli(DB_Host, DB_User, DB_Password, DB_Name) or die("Connection failed: " . $conn->connect_error);
         $output = $this->getLastVersionOfCraweleredURL($conn);
-        mysqli_close($conn);   
+        //mysqli_close($conn);   
         return $output;
         
     }

@@ -186,7 +186,7 @@ class Signature {
     
     public function getInitialSentance() {
         $this->initialSentance = substr($this->givenSentance, 0, $this->userID_StartPos-1- strlen("<a href=\"/wiki/User"));
-        //$GLOBALS['log'] .="<br/><span class='good'> Initial Sentance:</span><br/> ".strip_tags($this->initialSentance)."(".strlen($this->initialSentance)." = ".strlen($this->givenSentance)."- ".strlen($this->remainingSentance).") ";
+        $GLOBALS['log'] .="<br/><span class='good'> Initial Sentance:</span><br/> ".($this->initialSentance)."(".strlen($this->initialSentance)." = ".strlen($this->givenSentance)."- ".strlen($this->remainingSentance).") ";
     }
     
     public function getAfterUTC_Position() {

@@ -31,8 +31,8 @@
 
     function closetags($html) {
         // for bug in presentation
-        if ( preg_match("/href=/i",$html) )
-            $html .= "\"></a>";
+        //if ( preg_match("/href=/i",$html) )
+        //    $html .= "\"></a>";
             
         preg_match_all('#<(?!meta|img|br|hr|input\b)\b([a-z]+)(?: .*)?(?<![/|/ ])>#iU', $html, $result);
         $openedtags = $result[1];

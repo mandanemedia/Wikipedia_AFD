@@ -27,5 +27,5 @@ for($i=$fromID; $i<= $toID; $i++)
    $debateDate = new DebateDate($i);
    $debateDate->updateTotalAFD_inDB();   
 }
-
+echo "All Done xxxxxxxx";
 ?>

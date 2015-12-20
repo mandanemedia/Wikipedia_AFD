@@ -73,6 +73,7 @@ class ParseAFD_OtherComment{
                 $otherComment_Total = 0;
                 
                 $GLOBALS['log'] .=  closetags($this->otherComment_Html);
+                
                 $this->distinguishComments = new DistinguishComments($this->otherComment_Html, $this->debateDate->url);
                 
                 //Update AFD table

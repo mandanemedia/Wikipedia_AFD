@@ -45,8 +45,8 @@ class CommentLink {
     }
     
    function __destruct() {
-        if(is_resource($this->conn))
-            mysqli_close($this->conn);
+       // if(is_resource($this->conn))
+//            mysqli_close($this->conn);
    }
    
     //could be optimize by passing another boolean argument and limit the variable
@@ -147,8 +147,8 @@ class CommentLink {
             }
             else
                 throw new Exception('Error on mysqli_query!');
-            if(!$givenConn) 
-                mysqli_close($conn);
+            //if(!$givenConn) 
+//                mysqli_close($conn);
             
             closeDBConnection($conn, $conn_NeedToClose);
         }
@@ -294,7 +294,7 @@ class CommentLink {
             
             //$GLOBALS['log'] .= "<br/>sql:$sql";
             if (mysqli_query($this->conn, $sql)) {
-                $GLOBALS['log'] .= "<br/> CommentLink updated (update_CommentLink) <span class='good'>successfully</span> to DB AFDID=$this->AFDID, commentLinkID=$this->commentLinkID";
+                $GLOBALS['log'] .= "<br/> update_CommentLink <span class='good'>successfully</span> to DB <a target='_blank' href='getAFDHtmlByID.php?id=$this->AFDID'> AFDID=$this->AFDID </a>, commentLinkID=$this->commentLinkID<br/>";
             } else {
                 $GLOBALS['log'] .= "<br/> CommentLink <span class='bad'>Failed</span> to update to DB";
                 $GLOBALS['log'] .= "<br/>  <span class='bad'> Error description: " . mysqli_error($this->conn). "</span>";

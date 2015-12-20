@@ -58,7 +58,7 @@ class DebateDate {
               mysqli_free_result($result);
             }
             
-            mysqli_close($this->conn );  
+            //mysqli_close($this->conn );  
             //$this->setLog();
         }
         catch (Exception $e) {
@@ -293,8 +293,8 @@ class DebateDate {
     
     public function __destruct()
     {
-        if(is_resource($conn))
-            mysqli_close($this->conn); 
+        //if(is_resource($conn))
+//            mysqli_close($this->conn); 
     }
     
     public function addNewAFDByTitle($afd)

@@ -57,7 +57,7 @@
             $conn = new mysqli(DB_Host, DB_User, DB_Password, DB_Name) or die("Connection failed: " . $conn->connect_error);
             $sql = "select  debateDateListID as id, debateDate_Value as date
                     from debatedatelist
-                    where debatedatelistID < 70 ;";
+                    order by date;";
             
             if ( $result=mysqli_query($conn,$sql) )
                 while ( $obj=mysqli_fetch_object($result) )
@@ -71,14 +71,14 @@
             $conn = new mysqli(DB_Host, DB_User, DB_Password, DB_Name) or die("Connection failed: " . $conn->connect_error);
             $sql = "select  debateDateListID as id, debateDate_Value as date
                     from debatedatelist
-                    where debatedatelistID < 70 ;";
+                    order by date;";
             
             if ( $result=mysqli_query($conn,$sql) )
                 while ( $obj=mysqli_fetch_object($result) )
-                if($obj->id == 11)
+                /*if($obj->id == 11)
                     echo "<option value=\"$obj->id\" selected=\"selected\">$obj->date</option>";
                     
-                else
+                else*/
                     echo "<option value=\"$obj->id\">$obj->date</option>";
             ?>
         </select>

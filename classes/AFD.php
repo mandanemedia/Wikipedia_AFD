@@ -96,8 +96,8 @@ class AFD {
     }
     
     function __destruct() {
-        if(is_resource($this->conn))
-            mysqli_close($this->conn);
+        //if(is_resource($this->conn))
+//            mysqli_close($this->conn);
     }
     
     //could be optimize by passing another boolean argument and limit the variable
@@ -203,8 +203,8 @@ class AFD {
             }
             else
                 throw new Exception('Error on mysqli_query!');
-            if(!$givenConn) 
-                mysqli_close($conn);
+            //if(!$givenConn) 
+//                mysqli_close($conn);
         }
         catch (Exception $e) {
             echo 'Caught exception : ',  $e->getMessage(), "\n";

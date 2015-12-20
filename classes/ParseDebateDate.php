@@ -21,6 +21,8 @@ class ParseDebateDate {
     public $startParseTime = 0;
     public $endParseTime = 0;
     
+    
+   
     public function ParseDebateDate($givenID) {
         
         $this->startParseTime = date('Y-m-d H:i:s');
@@ -32,11 +34,13 @@ class ParseDebateDate {
         $this->givenURL = $this->debateDate->url;
         $this->givenHTML = $this->debateDate->html;
         
-        $this->setLog();
+        //$this->setLog();
         
         //call parse
-        $totalCalculated = $this->parseTableOfContent();
+        $totalCalculated = $this->parseTableOfContent(); //error from here.
         $this->parseContent($totalCalculated);
+        
+        
         
         $this->endParseTime = date('Y-m-d H:i:s');
         $parseDuration = round( (strtotime($this->endParseTime) - strtotime($this->startParseTime)) / 3600 * 60, 2);
@@ -46,7 +50,7 @@ class ParseDebateDate {
             $GLOBALS['log'] .= "<br/> this->totalParsed=$this->totalParsed with Error percentage(".round($this->parsedError/$this->totalParsed,2).") in ".$parseDuration." min.";
         else
             $GLOBALS['log'] .= "<br/> this->totalParsed=$this->totalParsed with Error percentage(0) in ".$parseDuration." min.";
-        $GLOBALS['log'] .= "<br/><span class='endCall'>**** End Called ParseDebateDate->ParseDebateDate()*******************</span><hr/><hr/>";
+        $GLOBALS['log'] .= "<br/><span id='endID' class='endCall'>**** End Called ParseDebateDate->ParseDebateDate()*******************</span><hr/><hr/>";
         
         echo $GLOBALS['log'];
         $GLOBALS['log'] = "";
@@ -57,6 +61,9 @@ class ParseDebateDate {
         $GLOBALS['log'] .=  "<br/> givenID = $this->givenID";
         $GLOBALS['log'] .=  "<br/> givenURL = $this->givenURL";
         $GLOBALS['log'] .=  "<br/> givenHTML = ". round((strlen($this->givenHTML)/1024),1)."KB";
+        echo $GLOBALS['log'];
+        $GLOBALS['log'] = "";
+        flush();
     }
     
     /*
@@ -88,9 +95,13 @@ class ParseDebateDate {
     function parseTableOfContent() {
         
         $GLOBALS['log'] .= "<br/> <span class='startCall'> ****************** Call ParseDebateDate->parseTableOfContent() <br/> <a target='_blank' <a href='getHtmlByID.php?id=".$this->debateDate->crawlerID."'>". $this->debateDate->url."</a> </span>";
+        
         try{
+            
             $dom = new simple_html_dom();
+            
             $dom->load($this->givenHTML, false);
+            
             
             $i=0;
             //
@@ -130,6 +141,7 @@ class ParseDebateDate {
                         }
                         $this->debateDate->updateTotalAFDTable($k);
                         $GLOBALS['log'] .= "<br/><b>Total AFD No. (Table)=".$this->debateDate->totalAFDTable."=".$this->debateDate->totalAFDContent."(Content) </b>";
+                        
                     }
                 if ($j<1) {
                     throw new Exception("<br/><span class='bad'> There is no URL in the table of content on the <a target='_blank' href='getHtmlByID.php?id=".$this->debateDate->crawlerID."'>". $this->debateDate->url."</a> </span>!");

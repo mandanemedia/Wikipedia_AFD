@@ -1040,8 +1040,8 @@ class simple_html_dom
     // load html from string
     function load($str, $lowercase=true, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
     {
-        global $debugObject;
-
+        
+        
         // prepare
         $this->prepare($str, $lowercase, $stripRN, $defaultBRText, $defaultSpanText);
         // strip out comments
