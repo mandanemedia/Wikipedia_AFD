@@ -9,14 +9,12 @@
               width: 960px;
               background-color: #ddd;
             }
+            h3 {
+                margin: 0;
+                padding: 0;
+            }
             text {
               font: 10px sans-serif;
-            }
-            
-            form {
-                margin-bottom: 20px;
-                width: auto;
-                float: right;
             }
             #chart
             {   
@@ -29,18 +27,16 @@
                 stroke: #aaa;
                 stroke-width:1px;   
             }
-        
-            text.mono {
+            text {
                 font-size: 9pt;
                 font-family: Consolas, courier;
-                fill: #aaa;
+                fill : #888888;
             }
-        
-            text.axis-workweek {
-                fill: #000;
+            text.columnLabel {
+                fill: green;
             }
-            text.axis-worktime {
-                fill: #000;
+            text.rowLabel {
+                fill: red;
             }
         </style>
         <script src="d3.v3.min.js"></script>

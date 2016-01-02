@@ -5,7 +5,8 @@ ini_set('MAX_EXECUTION_TIME', -1);
 $conn = new mysqli(DB_Host, DB_User, DB_Password, DB_Name) or die("Connection failed: " . $conn->connect_error);
 $sql = "select  *
         from _keepdeleteafd
-        where totalComments_delete < 29 and totalComments_keep < 29 ; ";
+        where   totalComments_delete < 24 
+                and totalComments_keep < 24 ; ";
 
 $records = array();
 if ( $result=mysqli_query($conn,$sql) or die(mysqli_error($conn)) )

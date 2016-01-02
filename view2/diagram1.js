@@ -1,29 +1,27 @@
-var margin = { top: 20, right: 0, bottom: 10, left: 30 };
+var margin = { top: 40, right: 0, bottom: 30, left: 40 };
 var width = 1024 - margin.left - margin.right;
-var height = 2430 - margin.top - margin.bottom;
-var gridSize = Math.floor(width / 40);
+var height = 1024 - margin.top - margin.bottom;
+var gridSize = Math.floor(width / 42);
 var legendElementWidth = gridSize*2;
-var colors = ["#FFFFFF", "#FF0000", "#FFFF00", "#00FF00"]; 
+var colors = ["#FFFFFF", "#FF0000", "#FFFF00", "#006400"]; 
+var colorsLegend = [1, 1.33, 1.66, 2, 2.33, 2.66, 3];
+var colorText = ["Delete" , "", "", "Other", "", "", "Keep"];
+var max_Keep = 0;
 
 getData();
 
 //http://synthesis.sbecker.net/articles/2012/07/16/learning-d3-part-6-scales-colors
 function getData()
 {
-    data1 = [];  
+    giveData = [];  
     d3.json("data1.php", function(error, data) {
-        //get the data from Database View PHP format
+        //get the data from Database from PHP page
         data.forEach(function(d){
-            data1.push(d);
+            d.average = ((+d.percentageOutcome_delete)*1 + (+d.percentageOutcome_other)*2 + (+d.percentageOutcome_keep)*3 ) /10000;
+            giveData.push(d);
         });
         //load the data on the screen
         document.getElementById( 'loadingMessage' ).innerHTML = "&nbsp";
-        //refine based on the target output
-        //data1 = new Array(data1);
-        maxTotal = d3.max(data1.map(function(d) { return +d.total; }));
-        sizeScale = d3.scale.linear()
-            .domain([1,maxTotal])
-            .range([6,gridSize]);
         updateData();
     });
 }
@@ -34,119 +32,117 @@ function isInArray(array, search)
   
 function updateData()
 {
-    var times = new Array();
-    for(var i=1; i<=28; i++)
-        times.push(i.toString());
+    max_Keep = d3.max(giveData.map(function(d) { return +d.totalComments_keep; }))
+    var column_keep_labelData = new Array();
+    for(var i=1; i<=max_Keep; i++)
+        column_keep_labelData.push(i.toString());
     
-    days = new Array();
-    //days_test = data1.map(function(d) { return d.day.toString(); });
-  
-    data1.forEach(function(d){
-        if(!isInArray(days, d.totalComments_delete.toString()))
-            days.push(d.totalComments_delete.toString());
+    row_delete_labelData = new Array();
+    giveData.forEach(function(d){
+        if(!isInArray(row_delete_labelData, d.totalComments_delete.toString()))
+            row_delete_labelData.push(d.totalComments_delete.toString());
     });
-    
-    data1.forEach(function(d){
-        d.day_int  = +days.indexOf(d.totalComments_delete);
-        d.sort  = +days.indexOf(d.totalComments_delete);
-    });
-    
     
     //overwrite to height
-    height = days.length * ( gridSize ) + 60;
-    
-      var colorScale = d3.scale.quantile()
-          .domain([0,10000,20000,30000])
-          .range(colors);
-      
-      
-      d3.select("#orderOption").property( "value", "0" );  
-      d3.select("#chart").select("svg").remove();
+    height = row_delete_labelData.length * ( gridSize ) + margin.bottom;
      
-      svg = d3.select("#chart").append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom )
-          .style("background-color","#EEE")
-          .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom )
+        .style("background-color","#EEE")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
-      dayLabels = svg.selectAll(".dayLabel")
-          .data(days)
-          .enter().append("text")
+    var rowLabels = svg.selectAll(".rowLabel")
+        .data(row_delete_labelData)
+        .enter().append("text")
             .text(function (d) { return d; })
             .attr("x", 0)
             .attr("y", function (d, i) { return i * gridSize; })
             .style("text-anchor", "end")
             .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-            .attr("class", function (d, i) { return ((i < 0) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+            .attr("class", function (d, i) { return "rowLabel"; });
     
-      var timeLabels = svg.selectAll(".timeLabel")
-          .data(times)
-          .enter().append("text")
+    var columnLabels = svg.selectAll(".columnLabel")
+        .data(column_keep_labelData)
+        .enter().append("text")
             .text(function(d) { return d; })
             .attr("x", function(d, i) { return i * gridSize; })
             .attr("y", 0)
             .style("text-anchor", "middle")
             .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-            .attr("class", function(d, i) { return ((i >= 4 && i <= 9) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+            .attr("class", function(d, i) { return "columnLabel"; });
         
-      heatMap = svg.selectAll(".hour")
-          .data(data1)
-          .enter().append("rect")
-                .attr("class", "hour bordered")
-                .attr("id", function (d){ return "rect_"+d.totalComments_delete+"_"+d.totalComments_keep })
-                .style("fill", colors[0])
-                .attr("rx", function (d){return 4;})
-                .attr("ry",  function (d){return 4;})
-                .attr("x", function(d) {return (+d.totalComments_keep-1) * gridSize ;})
-                .attr("y", function(d) {return +d.sort * gridSize ; })
-                .attr("height", function (d){ return gridSize; })
-                .attr("width", function (d){return gridSize;});
+    var afdsMap = svg.selectAll(".afd")
+        .data(giveData)
+        .enter().append("rect")
+            .attr("class", "afd bordered")
+            .attr("id", function (d){ return "rect_"+d.totalComments_delete+"_"+d.totalComments_keep })
+            .style("fill", colors[0])
+            .attr("rx", function (d){return 4;})
+            .attr("ry",  function (d){return 4;})
+            .attr("x", function(d) {return (+d.totalComments_keep-1) * gridSize ;})
+            .attr("y", function(d) {return (+d.totalComments_delete-1) * gridSize ; })
+            .attr("height", function (d){ return gridSize; })
+            .attr("width", function (d){return gridSize;});
     
-      heatMap.transition().duration(2000)
-          .style("fill", function(d) {
+    var colorScale = d3.scale.linear()
+        .domain([0, 1,  2,  3])
+        .range(colors);
+    
+    afdsMap.transition().duration(2000)
+        .style("fill", function(d) {
             var average = 0;
-            if((+d.percentageOutcome_delete) > (+d.percentageOutcome_other)
-                && (+d.percentageOutcome_delete) >(+d.percentageOutcome_keep))
-                average = 10000 ;//* (+d.percentageOutcome_delete);
-            else if ((+d.percentageOutcome_keep) > (+d.percentageOutcome_delete)
-                && (+d.percentageOutcome_keep) >(+d.percentageOutcome_other))
-                average = 30000 ;//* (+d.percentageOutcome_keep);
-            else if ((+d.percentageOutcome_other) > (+d.percentageOutcome_delete)
-                && (+d.percentageOutcome_other) >(+d.percentageOutcome_keep))
-                average = 20000 ;//* (+d.percentageOutcome_other) ;
+            if ((+d.totalAFDs) > 0 )
+               average = (+d.average);
             return colorScale(average); 
-          });
+        });
     
-      heatMap.append("title").text(function(d) { return "D:"+d.percentageOutcome_delete+" O:"+d.percentageOutcome_other+" K:"+d.percentageOutcome_keep ; });
-      
+      afdsMap.append("title").text(function(d) { return "A:"+d.average+" D:"+d.percentageOutcome_delete+" O:"+d.percentageOutcome_other+" K:"+d.percentageOutcome_keep ; });
       
       var legend = svg.selectAll(".legend")
-          .data(colors)
+          .data(colorsLegend)
           .enter().append("g")
           .attr("class", "legend");
-      var legendY = height-20;
-      var legendX = 35;
+      var legendY = height ;
+      var legendX = 0;
       
+      var colorScalelegend = d3.scale.linear()
+        .domain([1,  2,  3])
+        .range(colors);
+        
       legend.append("rect")
         .attr("x", function(d, i) { return legendElementWidth * i - legendX; })
         .attr("y", legendY )
         .attr("width", legendElementWidth)
         .attr("height", gridSize / 2)
-        .style("fill", function(d, i) { return colors[i]; });
+        .style("fill", function(d, i) {
+            return colorScale(+colorsLegend[i]); 
+        });
     
-      
-      var colorText = ["Keep", "" , "", "" , "Delete"];
       legend.append("text")
-        .attr("class", "mono")
+        .attr("class", "legendLabel")
         .text(function(d,i) { return colorText[i]; })
-        .attr("x", function(d, i) { return legendElementWidth * i + (legendElementWidth/2) - 22 - legendX; })
+        .attr("x", function(d, i) { return legendElementWidth * i + (legendElementWidth/2) - 18 - legendX; })
         .attr("y", legendY + gridSize -2  );
         
       svg.append("text")
-        .attr("class", "mono")
-        .text("Each rectangle represents the average color for the number of participants on a specific date.")
-        .attr("x", function(d ) { return  (legendElementWidth/2) - 28 - legendX; })
+        .attr("class", "legendText")
+        .text("Outcomes:")
+        .attr("x", function(d ) { return  (legendX); })
         .attr("y", legendY - 5  );
+        
+      svg.append("rect")
+        .attr("x", max_Keep * gridSize - legendElementWidth  )
+        .attr("y", legendY )
+        .attr("width", legendElementWidth)
+        .attr("height", gridSize / 2)
+        .style("fill", "white");
+      
+      svg.append("text")
+        .attr("class", "legendText")
+        .text("No AfD")
+        .attr("x", max_Keep * gridSize - legendElementWidth + 3 )
+        .attr("y", legendY + gridSize -2  );
 
 }
