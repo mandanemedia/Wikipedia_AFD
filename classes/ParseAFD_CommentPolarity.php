@@ -175,9 +175,9 @@ class ParseAFD_CommentPolarity{
         if($outputIndex == 0)
             $GLOBALS['log'] .= "<span class='good'> Polarity - Positive</span>";
         else if($outputIndex > 0)
-            $GLOBALS['log'] .= "<br/><span class='good'> Polarity - Positive</span> $outputText ($outputIndex)";
+            $GLOBALS['log'] .= " <span class='good'> Polarity - Positive</span> $outputText ($outputIndex)";
         else
-            $GLOBALS['log'] .= "<br/><span class='Bad'>Polarity - Negative :</span> $outputText ($outputIndex)";
+            $GLOBALS['log'] .= " <span class='Bad'>Polarity - Negative :</span> $outputText ($outputIndex)";
         return array($outputIndex, $outputText);
     }
     static function seprateSentenceByPositionID($givenHTML, $givenPosition, $giveLinkLabel)
@@ -200,7 +200,8 @@ class ParseAFD_CommentPolarity{
                 if( $startPosition <= $givenPosition &&  $givenPosition <= $endPosition )
                 {
                     $returnSentance = $sentance.".";
-                    $GLOBALS['log'] .=  "<br/><span class=''>-".strip_tags($sentance)."</span>";
+                    //The next line could be umcomment for debugging purpose.
+                    //$GLOBALS['log'] .=  "<br/><span class=''>-".strip_tags($sentance)."</span>";
                     //$GLOBALS['log'] .=  "( startPosition:$startPosition <= givenPosition:$givenPosition <= endPosition:$endPosition) ".substr($givenHTML, $givenPosition, 12)." ";
                     $GLOBALS['log'] .=  "<span class='percentage'>($giveLinkLabel)</span>";
                     if( strpos ( $returnSentance, $giveLinkLabel) === false)

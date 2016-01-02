@@ -48,7 +48,9 @@ if ( $result=mysqli_query($conn,$sql) )
 $records = convertEndResult_to_ColorCode($records);
 $records = calculateCounter_for_ColorCode2($records);
 $records = groupBy_CountAndDate($records);
-echo get_JsonFormat_simple($records);
+
+print json_encode($records);
+//echo get_JsonFormat_simple($records);
  
 function get_JsonFormat_simple($records)
 {     

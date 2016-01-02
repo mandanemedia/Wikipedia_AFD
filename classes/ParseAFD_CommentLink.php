@@ -143,7 +143,7 @@ class ParseAFD_CommentLink{
     {   
         $condition_Link = preg_match_all("/<a(.*?)<\/a>/i", $givenSentance, $matches_Link, PREG_OFFSET_CAPTURE);
         $output = array();
-        $GLOBALS['log'] .= "<br/><span class='givenSentance'>".closetags($givenSentance)."</span>"; 
+        //$GLOBALS['log'] .= "<br/><span class='givenSentance'>".closetags($givenSentance)."</span>"; 
         
         if($condition_Link>0)
         {
