@@ -30,7 +30,7 @@
             text {
                 font-size: 9pt;
                 font-family: Consolas, courier;
-                fill : #888888;
+                fill : #666;
             }
             text.columnLabel {
                 fill: green;
@@ -45,6 +45,6 @@
     <h3 id="loadingMessage" >Please wait, it is loading....</h3>
     <div id="chart"></div>
     <!-- Note this is important that D3 script be in the body section !-->
-    <script src="diagram1.js"></script>
+    <script src="diagram2.js"></script>
     </body>
 </html>
