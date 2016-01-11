@@ -1,0 +1,96 @@
+body {
+   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  position: relative;
+  width: 960px;
+  margin: auto;
+}
+#main {
+  float: left;
+  width: 750px;
+}
+
+#sidebar {
+  float: right;
+  width: 100px;
+}
+
+#sequence {
+  width: 600px;
+  height: 30px;
+}
+
+#legend {
+  padding: 10px 0 0 3px;
+}
+
+#sequence text, #legend text {
+  font-weight: 600;
+  fill: #fff;
+}
+
+#chart {
+  position: relative;
+  background: #fff;
+  width: 950px;
+  height: 580px;
+  float:left;
+  clear:both;
+}
+
+#chart path {
+  stroke: #fff;
+}
+
+#titleHover {
+  position: absolute;
+  text-align: center;
+  color: #666;
+  left: 10px;
+  top: 550px;
+  font-weight: 800;
+  font-size: 1.2em;
+}
+
+#explanation {
+  position: absolute;
+  top: 250px;
+  left: 230px;
+  cursor: pointer;
+  z-index: 0;
+}
+
+#percentage {
+  position: absolute;
+  text-align: left;
+  color: #666;
+  width: 140px;
+  top: 280px;
+  left: -215px;
+  font-size: 1.8em;
+}
+
+#title {
+  position: absolute;
+  text-align: left;
+  color: #666;
+  top: 300px;
+  left: -215px;
+  font-weight: 800;
+  font-size: 1.2em;
+}
+
+#delete {
+  position: absolute;
+  text-align: center;
+  color: #666;
+  width: 140px;
+  top: 50px;
+  font-size: 1.8em;
+}
+.pathlabel{
+    fill:#fff;
+    font-weight: 600;
+    font-size: 0.7em;
+}
