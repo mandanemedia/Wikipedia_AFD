@@ -18,7 +18,7 @@ body {
 
 #sequence {
   width: 600px;
-  height: 30px;
+  height: 33px;
 }
 
 #legend {
@@ -32,7 +32,7 @@ body {
 
 #chart {
   position: relative;
-  background: #fff;
+  background: #eee;
   width: 950px;
   height: 580px;
   float:left;
@@ -90,7 +90,8 @@ body {
   font-size: 1.8em;
 }
 .pathlabel{
-    fill:#fff;
+    fill:#666;
     font-weight: 600;
     font-size: 0.7em;
+    cursor: pointer;
 }
