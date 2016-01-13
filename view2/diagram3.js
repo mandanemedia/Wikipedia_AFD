@@ -1,7 +1,6 @@
 // Dimensions of sunburst.
 var width = 960;
 var height = 610;
-
 var radius = 645;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
@@ -21,9 +20,19 @@ var colors = {
   "Wikipedia:NOT": "#b17301",
   "Wikipedia:RS": "#c1a3d1"
 };
-var color_random = d3.scale.category20c();
-//http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
 
+var color_random = d3.scale.category20c();
+var colorScaleDelete = d3.scale.linear()
+                .domain([0.1, 1.3])
+                .range(["#FFF", "Red"]);
+var colorScaleOther = d3.scale.linear()
+                .domain([0.1, 1])
+                .range(["#FFF", "Yellow"]);
+var colorScaleKeep = d3.scale.linear()
+                .domain([0.1, .9])
+                .range(["#FFF", "Green"]);
+        
+//http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
 // Total size of all segments; we set this later, after loading the data.
 var totalSize = 0; 
 
@@ -92,23 +101,28 @@ function createVisualization(json) {
 
    path = vis.data([json]).selectAll("path")
       .data(nodes)
-      .enter().append("svg:path")
+      .enter()
+      .append("a")
+      .attr("xlink:href", function(d){ return "https://en.wikipedia.org#";} )
+      .attr("target","_blank")
+      .append("svg:path")
       .attr("display", function(d) { return d.depth ? null : "none"; })
       .attr("d", arc)
       .attr("fill-rule", "evenodd")
       .style("fill", "white" )
+      .style("stroke", "#ddd" )
+      .style("stroke-width", "1" ) 
       .style("fill", function(d,i) {
-        return color_random(d.name.replace("Wikipedia:","")); //colors[d.name];
+            return color_random(d.name.replace("Wikipedia:","")); //colors[d.name];
       })
       .style("opacity", 1)
-      .style("cursor", "pointer")
+      .style("cursor", "zoom-in")
       .attr("id",function(d){
             return d.depth+"_"+d.name.replace(':','') ;
         })
       //.on("click", enableCenter)
       .on("mouseenter", enableCenter);
       
-     
   var limitTextDisplay = 500;
   var radiusD = radius -400;
   var adjustR = { r1:radiusD-130 , r2:radiusD-70  , r3:radiusD-20 , r4:radiusD };
@@ -195,13 +209,13 @@ function enableCenter(d) {
     
       // Fade all the segments.
       d3.selectAll("path")
-          .style("opacity", 0.2);
+          .style("opacity", 0.4);
       d3.selectAll(".pathlabel")
         .style("opacity",function(d){
                             if(+d.depth==1) 
-                                return 0.2 
+                                return 0.3 
                             else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1600))
-                                return 0.2;
+                                return 0.3;
                             else
                                 return 0.01;
                         })
@@ -269,7 +283,8 @@ function getAncestors(node) {
 function initializeBreadcrumbTrail() {
     
   // Add the svg area.
-  var trail = d3.select("#sequence").append("svg:svg")
+  var trail = d3.select("#sequence")
+      .append("svg:svg")
       .attr("width", width)
       .attr("height", b.h)
       .attr("id", "trail");
@@ -303,26 +318,36 @@ function updateBreadcrumbs(nodeArray, percentageString) {
       .data(nodeArray, function(d) { return d.name + d.depth; });
 
   // Add breadcrumb and label for entering nodes.
-  var entering = g.enter().append("svg:g");
+  var entering = g.enter()
+                  .append("svg:g");
 
-  entering.append("svg:polygon")
-      .attr("points", breadcrumbPoints)
-      .style("fill", function(d,i) { 
-                    if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
-                    else
-                        return "#EEE";
-      })
-      .style("opacity", 0.5);
-  entering.append("svg:text")
-      .attr("x",function(d){ return (d.policyTitle.length*charToPix+charPadding + b.t) / 2;  })
-      .attr("y", b.h / 2)
-      .attr("dy", "0.40em")
-      .attr("text-anchor", "middle")
-      .attr("font-size", "12")
-      .style("fill", "#333")
-      .style("font-weight", "500")
-      .text(function(d) { return d.policyTitle ;  });
+  entering.append("a")
+            .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+d.policyURL;} )
+            .attr("target","_blank")
+              .style("cursor", function(d){
+                if(+d.depth >1)
+                    return "zoom-in";
+                else
+                    return "default";
+              })
+              .append("svg:polygon")
+              .attr("points", breadcrumbPoints)
+              .style("fill", function(d,i) { 
+                            if(+d.depth>0)
+                                return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                            else
+                                return "#ddd";
+              })
+              .style("opacity", 0.5);
+          entering.append("svg:text")
+              .attr("x",function(d){ return (d.policyTitle.length*charToPix+charPadding + b.t) / 2;  })
+              .attr("y", b.h / 2)
+              .attr("dy", "0.40em")
+              .attr("text-anchor", "middle")
+              .attr("font-size", "12")
+              .style("fill", "#333")
+              .style("font-weight", "500")
+              .text(function(d) { return d.policyTitle ;  });
 
   // Set position for entering and updating nodes.
   g.attr("transform", function(d, i) {
@@ -401,8 +426,6 @@ function setExtraAttributes()
             .attr("x", -105 )
             .attr("y", circleCenter.y );
             
-            
-            
         path.each(function(d,i){
             //console.log(d.name+"@"+d.depth);
             for (var i = 0; i < percentageData.length; i++) {
@@ -420,7 +443,18 @@ function setExtraAttributes()
                         d["percentage_total"] = (d.value / totalSize).toPrecision(3) ;
                      }
             }
+            var url = d.policyURL;
+            d3.select(this.parentNode)
+              .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+url;} );
         });
+            
+            
+        path.append("title")
+            .text(function(d) { return  d.policyTitle; });
+        
+        
+        
+        colorCodeOfPath();
     }
 }
 
@@ -436,6 +470,108 @@ var opacityTextBackground = 0.50;
     var percentageScale = d3.scale.linear()
         .domain([0.0,0.99])
         .range([0.5,250]);
+
+function colorCodeOfPath()
+{
+    var startX = - circleCenter.x + 5 ;
+    var startY = circleCenter.y -10 - 65;
+    var strokeColor = "rgb(136, 136, 136)";
+    var distance2 = distance + 1;
+    
+    vis.append("text")                
+        .attr("class", "legendText")    
+        .text("Hover Coding")          
+        .attr("x", startX    )
+        .attr("y", startY - 6 );
+    vis.append("text")                
+        .attr("class", "legendText")    
+        .text("Normal")            
+        .attr("x", startX + heightRec + 3 )
+        .attr("y", startY + 12 + distance2*0 );
+    vis.append("text")                
+        .attr("class", "legendText")    
+        .text("Delete")          
+        .attr("x", startX + heightRec + 3 )
+        .attr("y", startY + 12 + distance2*1 );
+    vis.append("text")                
+        .attr("class", "legendText")    
+        .text("Other")          
+        .attr("x", startX + heightRec + 3 )
+        .attr("y", startY + 12 + distance2*2 );
+    vis.append("text")                
+        .attr("class", "legendText")    
+        .text("Keep")          
+        .attr("x", startX + heightRec + 3 )
+        .attr("y", startY + 12 + distance2*3 );
+            
+    //All 
+    vis.append("rect")
+        .attr("class", "colorCodeOfPath")
+        .style("fill", "#ddd")
+        .style("cursor", "pointer")
+        .style("stroke-width", "1")
+        .style("stroke", function (d){return  strokeColor;})
+        .attr("x", function (d){return  startX;} )
+        .attr("y", function (d){return  startY;} )
+        .attr("height",function (d){return  heightRec;} )
+        .attr("width", function (d){return  heightRec;})
+        .on("mouseenter", function (d){
+            path.style("fill", function(d,i) {
+                return color_random(d.name.replace("Wikipedia:",""));
+            });
+        });
+    
+    //Delete 
+    vis.append("rect")
+        .attr("class", "colorCodeOfPath")
+        .style("fill", "red")
+        .style("cursor", "pointer")
+        .style("stroke-width", "1")
+        .style("stroke", function (d){return  strokeColor;})
+        .attr("x", function (d){return  startX;} )
+        .attr("y", function (d){return  startY+distance2;} )
+        .attr("height",function (d){return  heightRec;} )
+        .attr("width", function (d){return  heightRec;})
+        .on("mouseenter", function (d){
+            path.style("fill", function(d,i) {
+                return colorScaleDelete(+d.percentage_delete);
+            });
+        });
+        
+    //other 
+    vis.append("rect")
+        .attr("class", "colorCodeOfPath")
+        .style("fill", "yellow")
+        .style("cursor", "pointer")
+        .style("stroke-width", "1")
+        .style("stroke", function (d){return  strokeColor;})
+        .attr("x", function (d){return  startX;} )
+        .attr("y", function (d){return  startY+distance2+distance2;} )
+        .attr("height",function (d){return  heightRec;} )
+        .attr("width", function (d){return  heightRec;})
+        .on("mouseenter", function (d){
+            path.style("fill", function(d,i) {
+                return colorScaleOther(+d.percentage_other);
+            });
+        });  
+          
+    //keep 
+    vis.append("rect")
+        .attr("class", "colorCodeOfPath")
+        .style("fill", "green")
+        .style("cursor", "pointer")
+        .style("stroke-width", "1")
+        .style("stroke", function (d){return  strokeColor;})
+        .attr("x", function (d){return  startX;} )
+        .attr("y", function (d){return  startY+distance2+distance2+distance2;} )
+        .attr("height",function (d){return  heightRec;} )
+        .attr("width", function (d){return  heightRec;})
+        .on("mouseenter", function (d){
+            path.style("fill", function(d,i) {
+                return colorScaleKeep(+d.percentage_keep);
+            });
+        });
+}
 
 var ps = {
   sx:baseX - (heightRec*3) -3 , 
@@ -498,7 +634,7 @@ function displayBarChar(d)
                 if(+d.depth>0)
                         return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
                     else
-                        return "#EEE";
+                        return "#ddd";
       });
     
     
@@ -547,11 +683,11 @@ function displayBarChar(d)
                   .attr("target","_blank")
                   .append("svg:text")
                   .attr("class", "barChartText")
-                  .style("fill", function(d){
+                  .style("cursor", function(d){
                     if(+d.depth >1)
-                        return "blue";
+                        return "zoom-in";
                     else
-                        return "#666";
+                        return "default";
                   })
                   .attr("dy", "0.45em")
                   .attr("text-anchor", "left")
@@ -564,13 +700,14 @@ function displayBarChar(d)
                 .enter()
                 .append("rect")
                 .attr("class", "barChartTotal")
-                .style("fill", "#4F30B3")
+                .style("fill", "#ddd")
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYtotal + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){return  percentageScale(+(d.percentage_total));});
+                .attr("width", function (d){return  percentageScale(+(d.percentage_total));})
+                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
     vis.selectAll(".barChartLegend2").remove();
     vis.selectAll(".barChartLegend2")
                 .data(rectData)
@@ -607,7 +744,6 @@ function displayBarChar(d)
                                             return (+(d.percentage_total*100)).toFixed(2)+"%";  
                                                 });
      
-    
     
     vis.selectAll(".line_dash").remove();
     vis.append("line")
@@ -651,7 +787,8 @@ function displayBarChar(d)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYDelete + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){return  percentageScale(+(d.percentage_delete));});
+                .attr("width", function (d){return  percentageScale(+(d.percentage_delete));})
+                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
     vis.selectAll(".barChartLegend3").remove();
     vis.selectAll(".barChartLegend3")
                 .data(rectData)
@@ -698,7 +835,8 @@ function displayBarChar(d)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYOther + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){return  percentageScale(+(d.percentage_other));});
+                .attr("width", function (d){return  percentageScale(+(d.percentage_other));})
+                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
     vis.selectAll(".barChartLegend4").remove();
     vis.selectAll(".barChartLegend4")
                 .data(rectData)
@@ -745,7 +883,8 @@ function displayBarChar(d)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYKeep + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){return  percentageScale(+(d.percentage_keep));});
+                .attr("width", function (d){return  percentageScale(+(d.percentage_keep));})
+                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
     vis.selectAll(".barChartLegend5").remove();
     vis.selectAll(".barChartLegend5")
                 .data(rectData)
