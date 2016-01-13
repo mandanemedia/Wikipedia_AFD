@@ -1,10 +1,11 @@
 body {
-   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11px;
   font-weight: 400;
   position: relative;
   width: 960px;
   margin: auto;
+  background: #eee;
 }
 #main {
   float: left;
@@ -18,7 +19,7 @@ body {
 
 #sequence {
   width: 600px;
-  height: 33px;
+  height: 26px;
 }
 
 #legend {
@@ -28,13 +29,14 @@ body {
 #sequence text, #legend text {
   font-weight: 600;
   fill: #fff;
+  text-shadow: #999 1px 1px 3px;
 }
 
 #chart {
   position: relative;
   background: #eee;
-  width: 950px;
-  height: 580px;
+  width: 960px;
+  height: 610px;
   float:left;
   clear:both;
 }
@@ -63,19 +65,19 @@ body {
 
 #percentage {
   position: absolute;
-  text-align: left;
+  text-align:center;
   color: #666;
   width: 140px;
-  top: 280px;
-  left: -215px;
-  font-size: 1.8em;
+  top: 42px;
+  left: 0px;
+  font-size: 1.4em;
 }
 
 #title {
   position: absolute;
   text-align: left;
   color: #666;
-  top: 300px;
+  top: 320px;
   left: -215px;
   font-weight: 800;
   font-size: 1.2em;
@@ -90,8 +92,19 @@ body {
   font-size: 1.8em;
 }
 .pathlabel{
-    fill:#666;
+    fill:#777;
     font-weight: 600;
     font-size: 0.7em;
     cursor: pointer;
+    text-shadow: #fff 1px 1px 5px;
+}
+.legendText{
+    fill: #777;
+}
+.barChartText{
+    text-shadow: #777 1px 1px;
+}
+.legendText2{
+    fill: #333;
+    text-shadow: #777 1px 1px;
 }

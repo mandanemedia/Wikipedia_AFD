@@ -4,6 +4,9 @@ ini_set('MAX_EXECUTION_TIME', -1);
 
 $conn = new mysqli(DB_Host, DB_User, DB_Password, DB_Name) or die("Connection failed: " . $conn->connect_error);
 $sql = "select *
+        from visualization3_t0 
+        union
+        select *
         from visualization3_t1 
         union
         select *
