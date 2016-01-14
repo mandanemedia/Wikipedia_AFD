@@ -1,13 +1,13 @@
 // Dimensions of sunburst.
 var width = 960;
 var height = 610;
-var radius = 645;
+var radius = 690;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
 var b = {
   w: 175, h: 24, s: 3, t: 10
 };
-var circleCenter = {x:300, y:300};
+var circleCenter = {x:300, y:275};
   
 // Mapping of step names to colors.
 var colors = {
@@ -23,7 +23,7 @@ var colors = {
 
 var color_random = d3.scale.category20c();
 var colorScaleDelete = d3.scale.linear()
-                .domain([0.1, 1.3])
+                .domain([0.1, 1.4])
                 .range(["#FFF", "Red"]);
 var colorScaleOther = d3.scale.linear()
                 .domain([0.1, 1])
@@ -41,7 +41,7 @@ var vis = d3.select("#chart").append("svg:svg")
     .attr("height", height)
     .append("svg:g")
     .attr("id", "container")
-    .attr("transform", "translate(" + circleCenter.x + "," + circleCenter.y + ")");
+    .attr("transform", "translate(" + circleCenter.x + "," + (circleCenter.y+60) + ")");
 
 
 var partition = d3.layout.partition()
@@ -52,18 +52,33 @@ var arc = d3.svg.arc()
     .startAngle(function(d) { return d.x; })
     .endAngle(function(d) { return d.x + d.dx; })
     .innerRadius(function(d) {  if(d.depth == 1)
-                                    return Math.sqrt(d.y ) - 292 ; 
+                                    return Math.sqrt(d.y ) - 285 ;  //0
+                                else if(d.depth == 2) 
+                                    return Math.sqrt(d.y ) - 310  ; //1
+                                else if(d.depth == 3)
+                                    return Math.sqrt(d.y ) - 360 ; //2
                                 else
-                                    return Math.sqrt(d.y ) -360 ; 
+                                    return Math.sqrt(d.y ) - 365  ; //3
                                         })
-    .outerRadius(function(d) { return Math.sqrt(d.y + d.dy   ) -360 ; });
+    .outerRadius(function(d) { 
+                                if(d.depth == 1)
+                                    return Math.sqrt(d.y + d.dy ) - 310 ; //1
+                                else if(d.depth == 2)
+                                    return Math.sqrt(d.y + d.dy ) - 360  ; //2
+                                else if(d.depth == 3)
+                                    return Math.sqrt(d.y + d.dy ) - 365 ; //3
+                                else
+                                    return Math.sqrt(d.y + d.dy  ) -360  ; //4
+        
+        //return Math.sqrt(d.y + d.dy   ) -360 ; 
+        });
 
 var json, csv;
 var root;
 var path;
 
 var percentageData = [];
-d3.json("data3_percentage.php", function(error, data) {
+d3.json("data4_percentage.php", function(error, data) {
         //get the data from Database - PHP 
         data.forEach(function(d){
             percentageData.push(d);
@@ -71,7 +86,7 @@ d3.json("data3_percentage.php", function(error, data) {
 });
 
 var givenData = []; 
-d3.json("data3.php", function(error, data) {
+d3.json("data4.php", function(error, data) {
         //get the data from Database - PHP 
         data.forEach(function(d){
             givenData.push(d);
@@ -101,10 +116,10 @@ function createVisualization(json) {
 
    path = vis.data([json]).selectAll("path")
       .data(nodes)
-      .enter()
+      .enter()/*
       .append("a")
       .attr("xlink:href", function(d){ return "https://en.wikipedia.org#";} )
-      .attr("target","_blank")
+      .attr("target","_blank")*/
       .append("svg:path")
       .attr("display", function(d) { return d.depth ? null : "none"; })
       .attr("d", arc)
@@ -116,7 +131,7 @@ function createVisualization(json) {
             return color_random(d.name.replace("Wikipedia:","")); //colors[d.name];
       })
       .style("opacity", 1)
-      .style("cursor", "zoom-in")
+      .style("cursor", "pointer")
       .attr("id",function(d){
             return d.depth+"_"+d.name.replace(':','') ;
         })
@@ -125,7 +140,7 @@ function createVisualization(json) {
       
   var limitTextDisplay = 500;
   var radiusD = radius -400;
-  var adjustR = { r1:radiusD-130 , r2:radiusD-70  , r3:radiusD-20 , r4:radiusD };
+  var adjustR = { r1:radiusD-185 , r2:radiusD-75  , r3:radiusD-94 , r4:radiusD-85  };
   var text = vis.selectAll("text")
                         .data(nodes)
                         .enter()
@@ -148,9 +163,11 @@ function createVisualization(json) {
                                 return d.name;
                          })
                         .style("opacity",function(d){
-                            if(+d.depth==1) 
+                            if(+d.depth==1 && +d.value > 1800) 
                                 return 1; 
-                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1600))
+                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1000))
+                                return 1;
+                            else if((+d.depth== 4 && +d.value > 342))
                                 return 1;
                             else
                                 return 0.01;
@@ -183,7 +200,7 @@ function enableCenter(d) {
       var label = d.name ;
       var percentageString = percentage + "%";
       if (percentage < 0.1) {
-        percentageString = "<0.1%";
+        percentageString = "< 0.1%";
       }
     
       /*d3.select("#title")
@@ -211,10 +228,12 @@ function enableCenter(d) {
       d3.selectAll("path")
           .style("opacity", 0.4);
       d3.selectAll(".pathlabel")
-        .style("opacity",function(d){
-                            if(+d.depth==1) 
-                                return 0.3 
-                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1600))
+                        .style("opacity",function(d){
+                            if(+d.depth==1 && +d.value > 1800) 
+                                return 0.3 ; 
+                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1000))
+                                return 0.3 ;
+                            else if((+d.depth== 4 && +d.value > 342))
                                 return 0.3;
                             else
                                 return 0.01;
@@ -254,10 +273,12 @@ function disableCenter(d){
   d3.selectAll(".pathlabel")
       .transition()
       .duration(1000)
-        .style("opacity",function(d){
-                            if(+d.depth==1) 
+                        .style("opacity",function(d){
+                            if(+d.depth==1 && +d.value > 1800) 
                                 return 1; 
-                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1600))
+                            else if((+d.depth== 3 && +d.value > 800) || (+d.depth== 2 && +d.value > 1000))
+                                return 1;
+                            else if((+d.depth== 4 && +d.value > 342))
                                 return 1;
                             else
                                 return 0.01;
@@ -321,13 +342,13 @@ function updateBreadcrumbs(nodeArray, percentageString) {
   var entering = g.enter()
                   .append("svg:g");
 
-  entering.append("a")
+  entering/*.append("a")
             .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+d.policyURL;} )
-            .attr("target","_blank")
+            .attr("target","_blank")*/
               .style("cursor", function(d){
-                if(+d.depth >1)
-                    return "zoom-in";
-                else
+                //if(+d.depth >1)
+                //    return "zoom-in";
+                //else
                     return "default";
               })
               .append("svg:polygon")
@@ -422,9 +443,9 @@ function setExtraAttributes()
         
         vis.append("text")                
             .attr("class", "legendText2")   
-            .text("Percentage of mentioned policies in AfDs:")          
+            .text("Percentage of mentioned Categories in AfDs:")          
             .attr("x", -105 )
-            .attr("y", circleCenter.y );
+            .attr("y", circleCenter.y - 5 );
             
         path.each(function(d,i){
             //console.log(d.name+"@"+d.depth);
@@ -443,9 +464,9 @@ function setExtraAttributes()
                         d["percentage_total"] = (d.value / totalSize).toPrecision(2) ;
                      }
             }
-            var url = d.policyURL;
+            /*var url = d.policyURL;
             d3.select(this.parentNode)
-              .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+url;} );
+              .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+url;} );*/
         });
             
             
@@ -461,8 +482,8 @@ function setExtraAttributes()
 var distance = 21;
 var heightRec = 16;
 var baseX = 399 ;
-var baseYText = -288;
-var baseYtotal = baseYText + 122 ;
+var baseYText = -324;
+var baseYtotal = baseYText + 126 ;
 var baseYDelete = baseYtotal + 122 ;
 var baseYOther = baseYDelete + 122 ;
 var baseYKeep = baseYOther + 122 ;
@@ -474,7 +495,7 @@ var opacityTextBackground = 0.50;
 function colorCodeOfPath()
 {
     var startX = - circleCenter.x + 5 ;
-    var startY = circleCenter.y -10 - 65;
+    var startY = circleCenter.y -10 - 75;
     var strokeColor = "rgb(136, 136, 136)";
     var distance2 = distance + 1;
     
@@ -641,19 +662,19 @@ function displayBarChar(d)
     if(!inistialText)
     {
         inistialText = true;
+        /*vis.append("text")                
+            .attr("class", "legendText")    
+            .text("Categories' Title")          
+            .attr("x", -circleCenter.x +2  )
+            .attr("y", -circleCenter.y -48);*/
         vis.append("text")                
             .attr("class", "legendText")    
-            .text("Policies' Title")          
-            .attr("x", -circleCenter.x   )
-            .attr("y", -circleCenter.y +10);
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Policies' Shortcuts:")          
+            .text("Categories' Shortcuts:")          
             .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
             .attr("y", baseYText );
         vis.append("text")                
             .attr("class", "legendText")    
-            .text("Percentage of mentioned policies in AfDs:")          
+            .text("Percentage of mentioned Categories in AfDs:")          
             .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
             .attr("y", baseYtotal );
         vis.append("text")                
@@ -677,16 +698,16 @@ function displayBarChar(d)
     vis.selectAll(".barChartText").remove();
     vis.selectAll(".barChartText")
                   .data(rectData)
-                  .enter()
+                  .enter()/*
                   .append("a")
                   .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+d.policyURL;} )
-                  .attr("target","_blank")
+                  .attr("target","_blank")*/
                   .append("svg:text")
                   .attr("class", "barChartText")
                   .style("cursor", function(d){
-                    if(+d.depth >1)
-                        return "zoom-in";
-                    else
+                    //if(+d.depth >1)
+                    //    return "zoom-in";
+                    //else
                         return "default";
                   })
                   .attr("dy", "0.45em")

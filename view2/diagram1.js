@@ -161,7 +161,7 @@ function updateData()
         .style("fill", "green");        
                                         
      svg.append("text")                 
-        .text("Keep votes")             
+        .text("Number of Keep votes")             
         .attr("x", margin.left - 10  )  
         .attr("y", 10 - margin.top + 5);
     
@@ -183,7 +183,7 @@ function updateData()
     
      svg.append("text")
         .style("writing-mode", "tb")
-        .text("Delete votes")
+        .text("Number of Delete votes")
         .attr("x", 15 - margin.left   )
         .attr("y", 10 - margin.top  + 60 );
 
