@@ -170,13 +170,13 @@ function updateData()
                                         
       svg.append("text")                
         .attr("class", "legendText")    
-        .text("AfDs' Population ")  // .text("Population  -->  Percentage")             
+        .text("The Number of AfDs")  // .text("Population  -->  Percentage")             
         .attr("x", legendX + 20 )
         .attr("y", legendY - 5  );    
       
       svg.append("text")                
         .attr("class", "legendText")    
-        .text("Total Population:")              
+        .text("Total Number of AfDs:")              
         .attr("x", legendX + 18 )
         .attr("y", legendY + 535  );
         
@@ -202,7 +202,7 @@ function updateData()
         .style("fill", "green");        
                                         
      svg.append("text")                 
-        .text("Number of Keep votes")             
+        .text("The Number of Keep votes")             
         .attr("x", margin.left - 10  )  
         .attr("y", 10 - margin.top + 5);
     
@@ -223,7 +223,7 @@ function updateData()
     
      svg.append("text")
         .style("writing-mode", "tb")
-        .text("Number of Delete votes")
+        .text("The Number of Delete votes")
         .attr("x", 15 - margin.left   )
         .attr("y", 10 - margin.top  + 60 );
 

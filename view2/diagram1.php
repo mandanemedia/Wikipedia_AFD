@@ -27,6 +27,11 @@
                 stroke: #aaa;
                 stroke-width:1px;   
             }
+            rect.bordered2 {
+                stroke: #fff;
+                stroke-width:1px; 
+                opacity: 0.9;  
+            }
             text {
                 font-size: 9pt;
                 font-family: Consolas, courier;
@@ -37,6 +42,21 @@
             }
             text.rowLabel {
                 fill: red;
+            }
+            
+            .axis path,
+            .axis line {
+              fill: none;
+              stroke: #ccc;
+              width: 1px;
+              shape-rendering: crispEdges;
+            }
+            .y.axis g.tick:first-child
+            {
+                visibility: hidden;
+            }
+            .legendTextMain{
+                text-shadow: #999 1px 1px ;
             }
         </style>
         <script src="d3.v3.min.js"></script>
