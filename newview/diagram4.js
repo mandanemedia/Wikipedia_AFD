@@ -1,6 +1,6 @@
 // Dimensions of sunburst.
-var width = 960;
-var height = 610;
+var width = 970;
+var height = 620;
 var radius = 690;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
@@ -179,7 +179,7 @@ function createVisualization(json) {
                         .on("mouseenter", enableCenter);
       
   // Add the mouseleave handler to the bounding circle.
-  d3.select("#chart").on("mouseleave", disableCenter);
+  //d3.select("#chart").on("mouseleave", disableCenter);
   //d3.select("#explanation").on("click", disableCenter);
    
   // Get total size of the tree = value of root node from partition.
@@ -194,7 +194,7 @@ function createVisualization(json) {
 function enableCenter(d) {
   //in case of delay from database, this is to double check
   setExtraAttributes();  
-  if(isSet)
+  if(isSet && d.name != "root")
   {
       var percentage = (100 * d.value / totalSize).toPrecision(2);
       var label = d.name ;
@@ -213,16 +213,8 @@ function enableCenter(d) {
           .style("visibility", "")
     
       var sequenceArray = getAncestors(d);
-      sequenceArray.unshift({  depth:  0,
-                        name: percentageData[0]["policyTitle"],
-                        policyTitle:  percentageData[0]["policyTitle"],
-                        total : percentageData[0]["total"],
-                        percentage_delete:percentageData[0]["percentage_delete"],
-                        percentage_keep:percentageData[0]["percentage_keep"],
-                        percentage_other:percentageData[0]["percentage_other"],
-                        percentage_total:1.00 } );
                         
-      updateBreadcrumbs(sequenceArray, percentageString);
+      //updateBreadcrumbs(sequenceArray, percentageString);
     
       // Fade all the segments.
       d3.selectAll("path")
@@ -267,12 +259,12 @@ function disableCenter(d){
   // Transition each segment to full opacity and then reactivate it.
   d3.selectAll("path")
       .transition()
-      .duration(1000)
+      //.duration(1000)
       .style("opacity", 1);
       
   d3.selectAll(".pathlabel")
       .transition()
-      .duration(1000)
+      //.duration(1000)
                         .style("opacity",function(d){
                             if(+d.depth==1 && +d.value > 1800) 
                                 return 1; 
@@ -287,6 +279,9 @@ function disableCenter(d){
 
   d3.select("#explanation")
       .style("visibility", "hidden");
+  
+  displayBarChar("");
+  //updateBreadcrumbs([],"");
 }
 
 // Given a node in a partition layout, return an array of all of its ancestor
@@ -358,8 +353,7 @@ function updateBreadcrumbs(nodeArray, percentageString) {
                                 return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
                             else
                                 return "#ddd";
-              })
-              .style("opacity", 0.5);
+              });
           entering.append("svg:text")
               .attr("x",function(d){ return (d.policyTitle.length*charToPix+charPadding + b.t) / 2;  })
               .attr("y", b.h / 2)
@@ -479,68 +473,50 @@ function setExtraAttributes()
     }
 }
 
-var distance = 21;
+
+var distance = 110;
 var heightRec = 16;
 var baseX = 399 ;
-var baseYText = -324;
-var baseYtotal = baseYText + 126 ;
-var baseYDelete = baseYtotal + 122 ;
-var baseYOther = baseYDelete + 122 ;
-var baseYKeep = baseYOther + 122 ;
-var opacityTextBackground = 0.50;
-    var percentageScale = d3.scale.linear()
-        .domain([0.0,0.99])
-        .range([0.5,250]);
+var spanSpace = 20;
+var baseYText = -290;
+var baseYLabel = baseYText ;
+var baseYShortcut = baseYLabel + spanSpace ;
+var baseYDelete = baseYShortcut + spanSpace ;
+var baseYOther = baseYDelete + spanSpace ;
+var baseYKeep = baseYOther + spanSpace ;
+var opacityTextBackground = 1;
+var trafficLightOpacity = 0.75;
+var percentageScale = d3.scale.linear()
+    .domain([0.0,0.99])
+    .range([0.5,250]);
 
 function colorCodeOfPath()
 {
-    var startX = - circleCenter.x + 5 ;
-    var startY = circleCenter.y -10 - 75;
+    var startX = baseX - 52 ;
+    var startY = circleCenter.y -10 - 65;
     var strokeColor = "rgb(136, 136, 136)";
-    var distance2 = distance + 1;
+    var distance2 = 20;
     
     vis.append("text")                
-        .attr("class", "legendText")    
-        .text("Hover Coding")          
+        .attr("class", "legendTextTitle")    
+        .text("Mouse Over each of the below rectanges for different color coding:")          
         .attr("x", startX    )
         .attr("y", startY - 6 );
     vis.append("text")                
         .attr("class", "legendText")    
-        .text("Normal")            
+        .text("Delete votes")          
         .attr("x", startX + heightRec + 3 )
         .attr("y", startY + 12 + distance2*0 );
     vis.append("text")                
         .attr("class", "legendText")    
-        .text("Delete")          
+        .text("Other votes")          
         .attr("x", startX + heightRec + 3 )
         .attr("y", startY + 12 + distance2*1 );
     vis.append("text")                
         .attr("class", "legendText")    
-        .text("Other")          
+        .text("Keep votes")          
         .attr("x", startX + heightRec + 3 )
         .attr("y", startY + 12 + distance2*2 );
-    vis.append("text")                
-        .attr("class", "legendText")    
-        .text("Keep")          
-        .attr("x", startX + heightRec + 3 )
-        .attr("y", startY + 12 + distance2*3 );
-            
-    //All 
-    vis.append("rect")
-        .attr("class", "colorCodeOfPath")
-        .style("fill", "#ddd")
-        .style("cursor", "pointer")
-        .style("stroke-width", "1")
-        .style("stroke", function (d){return  strokeColor;})
-        .attr("x", function (d){return  startX;} )
-        .attr("y", function (d){return  startY;} )
-        .attr("height",function (d){return  heightRec;} )
-        .attr("width", function (d){return  heightRec;})
-        .on("mouseenter", function (d){
-            path.style("fill", function(d,i) {
-                return color_random(d.name.replace("Wikipedia:",""));
-            });
-        });
     
     //Delete 
     vis.append("rect")
@@ -548,12 +524,14 @@ function colorCodeOfPath()
         .style("fill", "red")
         .style("cursor", "pointer")
         .style("stroke-width", "1")
+        .style("opacity", trafficLightOpacity)
         .style("stroke", function (d){return  strokeColor;})
         .attr("x", function (d){return  startX;} )
-        .attr("y", function (d){return  startY+distance2;} )
+        .attr("y", function (d){return  startY;} )
         .attr("height",function (d){return  heightRec;} )
         .attr("width", function (d){return  heightRec;})
         .on("mouseenter", function (d){
+            disableCenter(d);
             path.style("fill", function(d,i) {
                 return colorScaleDelete(+d.percentage_delete);
             });
@@ -565,12 +543,14 @@ function colorCodeOfPath()
         .style("fill", "yellow")
         .style("cursor", "pointer")
         .style("stroke-width", "1")
+        .style("opacity", trafficLightOpacity)
         .style("stroke", function (d){return  strokeColor;})
         .attr("x", function (d){return  startX;} )
-        .attr("y", function (d){return  startY+distance2+distance2;} )
+        .attr("y", function (d){return  startY+distance2;} )
         .attr("height",function (d){return  heightRec;} )
         .attr("width", function (d){return  heightRec;})
         .on("mouseenter", function (d){
+            disableCenter(d);
             path.style("fill", function(d,i) {
                 return colorScaleOther(+d.percentage_other);
             });
@@ -582,219 +562,145 @@ function colorCodeOfPath()
         .style("fill", "green")
         .style("cursor", "pointer")
         .style("stroke-width", "1")
+        .style("opacity", trafficLightOpacity)
         .style("stroke", function (d){return  strokeColor;})
         .attr("x", function (d){return  startX;} )
-        .attr("y", function (d){return  startY+distance2+distance2+distance2;} )
+        .attr("y", function (d){return  startY+distance2+distance2;} )
         .attr("height",function (d){return  heightRec;} )
         .attr("width", function (d){return  heightRec;})
         .on("mouseenter", function (d){
+            disableCenter(d);
             path.style("fill", function(d,i) {
                 return colorScaleKeep(+d.percentage_keep);
             });
         });
+        
+    //Reset 
+    vis.append("rect")
+        .attr("class", "colorCodeOfPath")
+        .style("fill", "#555")
+        .style("cursor", "pointer")
+        .style("stroke-width", "1")
+        .style("stroke", "#ddd")
+        .attr("x", function (d){return  startX;} )
+        .attr("y", function (d){return  startY+distance2+distance2+distance2;} )
+        .attr("height",function (d){return  heightRec + 5 ;} )
+        .attr("width", function (d){return  (7*heightRec) + 2;})
+        .on("mouseenter", function (d){
+            disableCenter(d);
+            path.style("fill", function(d,i) {
+                return color_random(d.name.replace("Wikipedia:",""));
+            });
+        });
+    vis.append("text")                
+        .attr("class", "legendTextReset")    
+        .text("Reset to default")            
+        .attr("x", startX + heightRec - 1  )
+        .attr("y", startY + 12 + distance2*3 + 3)
+        .on("mouseenter", function (d){
+            disableCenter(d);
+            path.style("fill", function(d,i) {
+                return color_random(d.name.replace("Wikipedia:",""));
+            });
+        });
 }
-
-var ps = {
-  sx:baseX - (heightRec*3) -3 , 
-  sy:baseYText+5 , 
-  w: (heightRec*3) , 
-  h: heightRec, 
-  dy: heightRec/2, 
-  dx: 0, 
-  d:distance,
-  wLine: 100,
-  hLine: 1
-};
 
 var inistialText =  false;
-/*
-|\/|
-|  |___
-|   ___|
- \/
-*/
-function calculatePoint(d, i) {
-  var points = [];
-  var space = ps.d*i;
-  points.push((ps.sx) +","+(ps.sy+space)); // 1
-  points.push((ps.sx + (ps.w/2)) + "," + (ps.sy+ps.dy+space)); //2
-  points.push((ps.sx + ps.w) + "," +(ps.sy+space)); //3
-  points.push((ps.sx + ps.w)+ "," + (ps.sy+ps.h+space-ps.hLine) ); //4
-  points.push((ps.sx + ps.w+ps.wLine)+ "," + (ps.sy+ps.h+space-ps.hLine) ); //5
-  points.push((ps.sx + ps.w+ps.wLine)+ "," + (ps.sy+ps.h+space) ); //6
-  points.push((ps.sx + ps.w)+ "," + (ps.sy+ps.h+space) ); //7
-  points.push((ps.sx + (ps.w/2)) + "," + (ps.sy+ps.h+ps.dy+space) ); //8
-  points.push(ps.sx+"," + (ps.sy+ps.h+space));//9
-  return points.join(" ");
-}
 var rectData; 
-// Added 
 function displayBarChar(d)
 {
-    rectData = getAncestors(d);
-    rectData.unshift({  depth:  0,
-                        name: percentageData[0]["policyTitle"],
-                        policyURL:  "#",
-                        policyTitle:  percentageData[0]["policyTitle"],
-                        total : percentageData[0]["total"],
-                        percentage_delete:percentageData[0]["percentage_delete"],
-                        percentage_keep:percentageData[0]["percentage_keep"],
-                        percentage_other:percentageData[0]["percentage_other"],
-                        percentage_total:1.00 } );
-    
-    vis.selectAll(".barChartTextArrow").remove();
-    vis.selectAll(".barChartTextArrow")
-        .data(rectData)
-        .enter()
-        .append("svg:polygon")
-        .attr("class", "barChartTextArrow")
-        .attr("points", calculatePoint)
-        .style("stroke-width", "1")
-        .style("stroke", "#888")
-        .style("fill", function(d,i) { 
-                if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
-                    else
-                        return "#ddd";
-      });
-    
-    
     if(!inistialText)
     {
         inistialText = true;
         /*vis.append("text")                
             .attr("class", "legendText")    
-            .text("Categories' Title")          
-            .attr("x", -circleCenter.x +2  )
-            .attr("y", -circleCenter.y -48);*/
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Categories' Shortcuts:")          
+            .text("Details percentage of each Policy:")          
             .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
-            .attr("y", baseYText );
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Percentage of mentioned Categories in AfDs:")          
-            .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
-            .attr("y", baseYtotal );
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Delete - %:")          
-            .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
-            .attr("y", baseYDelete  );
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Other - %:")          
-            .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
-            .attr("y", baseYOther );
-        vis.append("text")                
-            .attr("class", "legendText")    
-            .text("Keep - % :")          
-            .attr("x", baseX - (heightRec+heightRec+ heightRec) - 4 )
-            .attr("y", baseYKeep );
+            .attr("y", baseYText );*/
     }
+    rectData = getAncestors(d);
     
-    //Title Section   
+    
+    //Title Section
+    /*vis.selectAll(".barChartShortCut").remove();
+    vis.selectAll(".barChartShortCut")
+                .data(rectData)
+                .enter()
+                .append("rect")
+                .attr("class", "barChartShortCut")
+                .style("fill", function(d,i) { 
+                            if(+d.depth>0)
+                                    return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                                else
+                                    return "#ddd";
+                })
+                .style("stroke-width", "1")
+                .style("stroke", "#888")
+                .attr("x", function(d, i ) {return baseX - (heightRec+heightRec+ heightRec) - 3 ;})
+                .attr("y", function(d, i ) {return baseYLabel + distance*i + 20; })
+                .attr("height", function (d){ return 1; })
+                .attr("width", function (d){ return heightRec * 16; })
+                .style("opacity", opacityTextBackground); 
+    vis.selectAll(".barChartTextLabel").remove();
+    vis.selectAll(".barChartTextLabel")
+                  .data(rectData)
+                  .enter()
+                  .append("a")
+                  .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+d.policyURL;} )
+                  .attr("target","_blank")
+                  .append("svg:text")
+                  .attr("class", "barChartTextLabel")
+                  .style("cursor", "pointer")
+                  .attr("dy", "0.45em")
+                  .attr("text-anchor", "left")
+                  .attr("x", function(d, i ) {return baseX - 52 ;})
+                  .attr("y", function(d, i ) {return baseYLabel + 10 + distance*i; })
+                  .text(function(d) { return "Policy Title: "+ d.policyTitle ;  });*/  
+                  
+    //Shortcut Section              
+    vis.selectAll(".barChartTitle").remove();
+    vis.selectAll(".barChartTitle")
+                .data(rectData)
+                .enter()
+                .append("rect")
+                .attr("class", "barChartTitle")
+                .style("fill", function(d,i) { 
+                            if(+d.depth>0)
+                                    return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                                else
+                                    return "#ddd";
+                })
+                .style("stroke-width", "1")
+                .style("stroke", "#888")
+                .attr("x", function(d, i ) {return baseX - (heightRec+heightRec+ heightRec)-3 ;})
+                .attr("y", function(d, i ) {return baseYShortcut + 5 + distance*i ; })
+                .attr("height", function (d){ return heightRec; })
+                .attr("width", function (d){ return heightRec + heightRec+ heightRec; })
+                .style("opacity", opacityTextBackground);
     vis.selectAll(".barChartText").remove();
     vis.selectAll(".barChartText")
                   .data(rectData)
-                  .enter()/*
+                  .enter()
                   .append("a")
                   .attr("xlink:href", function(d){ return "https://en.wikipedia.org"+d.policyURL;} )
-                  .attr("target","_blank")*/
+                  .attr("target","_blank")
                   .append("svg:text")
                   .attr("class", "barChartText")
                   .style("cursor", function(d){
-                    //if(+d.depth >1)
-                    //    return "zoom-in";
-                    //else
+                    if(+d.depth >1)
+                        return "zoom-in";
+                    else
                         return "default";
                   })
                   .attr("dy", "0.45em")
                   .attr("text-anchor", "left")
                   .attr("x", function(d, i ) {return baseX  ;})
-                  .attr("y", function(d, i ) {return baseYText + 12 + distance*i; })
-                  .text(function(d) { return d.name ;  })
-    vis.selectAll(".barChartTotal").remove();
-    vis.selectAll(".barChartTotal")
-                .data(rectData)
-                .enter()
-                .append("rect")
-                .attr("class", "barChartTotal")
-                .style("fill", "#ddd")
-                .style("stroke-width", "1")
-                .style("stroke", "#888")
-                .attr("x", function(d, i ) {return baseX  ;})
-                .attr("y", function(d, i ) {return baseYtotal + 5 + distance*i; })
-                .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){return  percentageScale(+(d.percentage_total));})
-                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
-    vis.selectAll(".barChartLegend2").remove();
-    vis.selectAll(".barChartLegend2")
-                .data(rectData)
-                .enter()
-                .append("rect")
-                .attr("class", "barChartLegend2")
-                .style("fill", function (d){  
-                    if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:",""));
-                    else
-                        return "#EEE";
-                })
-                .style("stroke-width", "1")
-                .style("stroke", "#888")
-                .attr("x", function(d, i ) {return baseX - (heightRec+heightRec+ heightRec) - 3 ;})
-                .attr("y", function(d, i ) {return baseYtotal + 5 + distance*i; })
-                .attr("height", function (d){ return heightRec; })
-                .attr("width", function (d){ return heightRec + heightRec+ heightRec; })
-                .style("opacity", opacityTextBackground);
-    vis.selectAll(".barChartLegendText2").remove();
-    vis.selectAll(".barChartLegendText2")
-                  .data(rectData)
-                  .enter()
-                  .append("svg:text")
-                  .attr("class", "barChartLegendText2")
-                  .style("fill", "#222")
-                  .attr("dy", "0.38em")
-                  .attr("text-anchor", "right")
-                  .attr("x", function(d, i ) {return baseX - (heightRec+heightRec+ heightRec - 3) ;})
-                  .attr("y", function(d, i )  {return baseYtotal + 12 + distance*i; })
-                  .text(function(d) {  if(+d.percentage_total == 1.00)
-                                            return (+(d.percentage_total*100)).toFixed(1)+"%";
-                                       else
-                                            return (+(d.percentage_total*100)).toFixed(2)+"%";  
-                                                });
-     
+                  .attr("y", function(d, i ) {return baseYShortcut + 12 + distance*i; })
+                  .text(function(d) { 
+                        return d.name + " ( "+ (+(d.percentage_total*100)).toFixed(2)+"% )";
+                  });
     
-    vis.selectAll(".line_dash").remove();
-    vis.append("line")
-                .attr("class", "line_dash")
-                .attr("x1", baseX+percentageScale(+(rectData[0].percentage_delete))+3)
-                .attr("y1", baseYDelete+ 8)
-                .attr("x2", baseX+percentageScale(+(rectData[0].percentage_delete))+3)
-                .attr("y2", baseYDelete + (rectData.length*distance))
-                .attr("stroke-width", 1)
-                .style("stroke-dasharray", ("3, 3"))
-                .attr("stroke", "#bbb");
-    vis.append("line")
-                .attr("class", "line_dash")
-                .attr("x1", baseX+percentageScale(+(rectData[0].percentage_other))+3)
-                .attr("y1", baseYOther+ 8)
-                .attr("x2", baseX+percentageScale(+(rectData[0].percentage_other))+3)
-                .attr("y2", baseYOther + (rectData.length*distance))
-                .attr("stroke-width", 1)
-                .style("stroke-dasharray", ("3, 3"))
-                .attr("stroke", "#bbb");
-    vis.append("line")
-                .attr("class", "line_dash")
-                .attr("x1", baseX+percentageScale(+(rectData[0].percentage_keep))+3)
-                .attr("y1", baseYKeep + 8)
-                .attr("x2", baseX+percentageScale(+(rectData[0].percentage_keep))+3)
-                .attr("y2", baseYKeep + (rectData.length*distance))
-                .attr("stroke-width", 1)
-                .style("stroke-dasharray", ("3, 3"))
-                .attr("stroke", "#bbb");
-                
+    
     //Delete Section                        
     vis.selectAll(".barChartDelete").remove();
     vis.selectAll(".barChartDelete")
@@ -805,22 +711,23 @@ function displayBarChar(d)
                 .style("fill", "red")
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
+                .style("opacity", trafficLightOpacity)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYDelete + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
                 .attr("width", function (d){return  percentageScale(+(d.percentage_delete));})
-                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
+                .append("title").text(function(d) { return "Delete Votes containing "+d.name + " category : " +((d.percentage_delete)*100).toFixed(2)+"%"; });
     vis.selectAll(".barChartLegend3").remove();
     vis.selectAll(".barChartLegend3")
                 .data(rectData)
                 .enter()
                 .append("rect")
                 .attr("class", "barChartLegend3")
-                .style("fill", function (d){  
-                    if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:",""));
-                    else
-                        return "#EEE";
+                .style("fill", function(d,i) { 
+                            /*if(+d.depth>0)
+                                    return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                                else*/
+                                    return "#eee";
                 })
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
@@ -853,22 +760,23 @@ function displayBarChar(d)
                 .style("fill", "yellow")
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
+                .style("opacity", trafficLightOpacity)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYOther + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
                 .attr("width", function (d){return  percentageScale(+(d.percentage_other));})
-                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
+                .append("title").text(function(d) { return "Other Votes containing "+d.name + " category : " +((d.percentage_other)*100).toFixed(2)+"%"; });
     vis.selectAll(".barChartLegend4").remove();
     vis.selectAll(".barChartLegend4")
                 .data(rectData)
                 .enter()
                 .append("rect")
                 .attr("class", "barChartLegend4")
-                .style("fill", function (d){  
-                    if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:",""));
-                    else
-                        return "#EEE";
+                .style("fill", function(d,i) { 
+                            /*if(+d.depth>0)
+                                    return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                                else*/
+                                    return "#eee";
                 })
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
@@ -901,22 +809,23 @@ function displayBarChar(d)
                 .style("fill", "green")
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
+                .style("opacity", trafficLightOpacity)
                 .attr("x", function(d, i ) {return baseX  ;})
                 .attr("y", function(d, i ) {return baseYKeep + 5 + distance*i; })
                 .attr("height", function (d){ return heightRec; })
                 .attr("width", function (d){return  percentageScale(+(d.percentage_keep));})
-                .append("title").text(function(d) { return  d.name+"\nTitle: "+d.policyTitle; });
+                .append("title").text(function(d) { return "Keep Votes containing "+d.name + " category : " +((d.percentage_keep)*100).toFixed(2)+"%"; });
     vis.selectAll(".barChartLegend5").remove();
     vis.selectAll(".barChartLegend5")
                 .data(rectData)
                 .enter()
                 .append("rect")
                 .attr("class", "barChartLegend5")
-                .style("fill", function (d){  
-                    if(+d.depth>0)
-                        return color_random(d.name.replace("Wikipedia:",""));
-                    else
-                        return "#EEE";
+                .style("fill", function(d,i) { 
+                            /*if(+d.depth>0)
+                                    return color_random(d.name.replace("Wikipedia:","")); //colors[d.name]; 
+                                else*/
+                                    return "#eee";
                 })
                 .style("stroke-width", "1")
                 .style("stroke", "#888")
@@ -937,10 +846,21 @@ function displayBarChar(d)
                   .attr("x", function(d, i ) {return baseX - (heightRec+heightRec+ heightRec - 3) ;})
                   .attr("y", function(d, i )  {return baseYKeep + 12 + distance*i; })
                   .text(function(d) { return (+(d.percentage_keep*100)).toFixed(2)+"%";  });
-                
-                
+     
+     
+    
+    
+     /*console.log(rectData[rectData.length-1]);
+     vis.selectAll(".guideLine").remove();
+     vis.append("line")
+        .attr("x1", 20)
+        .attr("y1", 0)
+        .attr("class", "guideLine")
+        .attr("x2", baseX - (heightRec+heightRec+ heightRec) - 3)
+        .attr("y2", baseYLabel + distance*(rectData.length-1) + 20)
+        .attr("stroke-width", 1)
+        .style("stroke-dasharray", ("3, 3"))
+        .attr("stroke", "#bbb"); */           
+        
 }
-
-
-
 
