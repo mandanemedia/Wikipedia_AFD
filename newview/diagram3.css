@@ -29,7 +29,7 @@ body {
 #sequence text, #legend text {
   font-weight: 600;
   fill: #fff;
-  text-shadow: #999 1px 1px 3px;
+  text-shadow: #fff 1px 1px 2px;
 }
 
 #chart {
@@ -71,6 +71,7 @@ body {
   top: 42px;
   left: 49px;
   font-size: 1.4em;
+  cursor: default;
 }
 
 #title {
@@ -101,7 +102,7 @@ body {
     fill: #777;
 }
 .barChartText{
-    text-shadow: #777 1px 1px;
+  text-shadow: #fff 1px 1px 2px;
 }
 .legendText2{
     fill: #333;
@@ -111,4 +112,19 @@ body {
 .barChartOther,
 .barChartKeep{
     cursor: pointer;
+}
+.barChartLegendText1,
+.barChartLegendText2,
+.barChartLegendText3,
+.barChartLegendText4,
+.barChartLegendText5{
+    text-shadow: #fff 1px 1px 5px;
+}
+.legendTextReset{
+    fill: #fff;
+    text-shadow: #ddd 1px 2px 1px;
+}
+.barChartTextLabel{
+    fill:#555;
+    font-weight: 600;
 }

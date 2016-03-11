@@ -13,7 +13,8 @@ $sql = "select *
         from visualization3_t2 
         union
         select *
-        from visualization3_t3 ; ";
+        from visualization3_t3 
+        ; ";
 
 $records = array();
 if ( $result=mysqli_query($conn,$sql) or die(mysqli_error($conn)) )

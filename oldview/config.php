@@ -1,7 +1,7 @@
 <?php
 
 /** MySQL database name */
-define('DB_Name', 'mandanem_afd_normalized');
+define('DB_Name', 'mandanem_afd');
 
 /** MySQL database username */
 define('DB_User', 'root');

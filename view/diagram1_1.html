@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+<script src="d3.v3.min.js"></script>
+<script>
+//Start Of second Section
+var deleteLayer =[];
+var keepLayer = [];
+var y0 = [];
+
+var n = 0, // number of layers
+    m = 0, // number of samples per layer
+    yGroupMax = 0, 
+    yStackMax = 0;
+
+var layers = [];
+var layer, x, y, xAxis, yAxis, svg, rect;
+
+var barchartWidth = 450;
+var barchartHeight = 500;
+var margin = {top: 40, right: 10, bottom: 20, left: 10},
+    width_2 = barchartWidth - margin.left - margin.right,
+    height_2 = barchartHeight - margin.top - margin.bottom;
+
+var checkGrouped = true;
+
+d3.json("data1_1.php", function(error, data) {
+            data.forEach(function(d,i){
+                    deleteLayer.push({"x":+d.x, "y":+d.y, "y0":0});
+                    y0[i] = +d.y;
+                });
+            d3.json("data1_2.php", function(error, data) {
+            data.forEach(function(d,i){
+                    keepLayer.push({"x":+d.x, "y":+d.y, "y0":y0[i]});
+                });
+                
+            //enforce to have same number of keep and delete
+            
+            layers.push(deleteLayer); 
+            layers.push(keepLayer);
+            
+            n = 2; 
+            mStart= 2;
+            m = 25;
+            yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); });
+            yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+        
+            x = d3.scale.ordinal()
+                .domain(d3.range(mStart, m))
+                .rangeRoundBands([0, width_2], .08);
+            
+            y = d3.scale.linear()
+                .domain([0, yStackMax])
+                .range([height_2, 0]);
+            
+            yAxisValue = d3.scale.linear()
+                .domain([0, yStackMax*500])
+                .range([height_2, 0]);
+            
+            color = d3.scale.linear()
+                .domain([0, n - 1])
+                .range(["#f00", "#0d0"]);
+            
+            xAxis = d3.svg.axis()
+                .scale(x)
+                .tickSize(0)
+                .tickPadding(6)
+                .orient("bottom");
+            
+            yAxis = d3.svg.axis()
+                .scale(yAxisValue)
+                .tickSize(0)
+                .tickPadding(6)
+                .orient("left");
+            
+            svg = d3.select("body").append("svg")
+                .attr("width", width_2 + margin.left + margin.right)
+                .attr("height", height_2 + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            
+            layer = svg.selectAll(".layer")
+                .data(layers)
+              .enter().append("g")
+                .attr("class", "layer")
+                .style("fill", function(d, i) { return color(i); });
+            
+            rect = layer.selectAll("rect")
+                .data(function(d) { return d; })
+                .enter().append("rect")
+                .attr("x", function(d) {
+                    return x(d.x); 
+                })
+                .attr("y", height_2)
+                .attr("width", x.rangeBand())
+                .attr("height", 0);
+            
+            rect.transition()
+                .delay(function(d, i) { return i * 10; })
+                .attr("y", function(d) { return y(d.y0 + d.y); })
+                .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+            
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height_2 + ")")
+                .call(xAxis);
+                
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + 5 + ",0)")
+                .call(yAxis);
+            
+            d3.selectAll('input[name="mode"]').on("change", change);
+            
+            //Hover function
+            svg.append("rect")
+            .attr("id", "Stacked")
+            .style("fill", "#fff")
+            .style("cursor", "pointer")
+            .style("stroke-width", "4")
+            .style("stroke", "#000")
+            .attr("x", function (d){return  width_2 - 50;} )
+            .attr("y", function (d){return  20;} )
+            .attr("height",function (d){return  15;} )
+            .attr("width", function (d){return  15;})
+            .on("mouseenter", function (d){
+                checkGrouped = false;
+                change();
+            });
+            svg.append("text")                
+                .attr("class", "legendText")    
+                .text("Stacked")          
+                .attr("x", width_2 - 30 )
+                .attr("y", 31);
+                
+            svg.append("rect")
+            .attr("id", "Grouped")
+            .style("fill", "#000")
+            .style("cursor", "pointer")
+            .style("stroke-width", "4")
+            .style("stroke", "#000")
+            .attr("x", function (d){return  width_2 - 50;} )
+            .attr("y", function (d){return  40;} )
+            .attr("height",function (d){return  15;} )
+            .attr("width", function (d){return  15;})
+            .on("mouseenter", function (d){
+                checkGrouped = true;
+                change();
+            });
+            svg.append("text")                
+                .attr("class", "legendText")    
+                .text("Grouped")          
+                .attr("x", width_2 - 30 )
+                .attr("y", 51);
+        
+            });
+        });
+
+
+function change() {
+  if (checkGrouped == true ) 
+  {
+        svg.select("#Grouped").style("fill", "#fff");
+        svg.select("#Stacked").style("fill", "#000");
+        transitionGrouped();
+  }
+  else  
+  {
+        svg.select("#Grouped").style("fill", "#000");
+        svg.select("#Stacked").style("fill", "#fff");
+        transitionStacked();
+  }
+}
+
+function transitionGrouped() {
+  y.domain([0, yGroupMax]);
+
+  rect.transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .attr("x", function(d, i, j) { 
+        return x(d.x) + x.rangeBand() / n * j; 
+      })
+      .attr("width", x.rangeBand() / n)
+    .transition()
+      .attr("y", function(d) { return y(d.y); })
+      .attr("height", function(d) { return height_2 - y(d.y); });
+}
+
+function transitionStacked() {
+  y.domain([0, yStackMax]);
+
+  rect.transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .attr("y", function(d) { return y(d.y0 + d.y); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+    .transition()
+      .attr("x", function(d) { 
+        return x(d.x); 
+      })
+      .attr("width", x.rangeBand());
+}
+//End Of second Section
+</script>

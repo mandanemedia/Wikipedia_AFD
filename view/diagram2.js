@@ -1,243 +1,230 @@
-var data1 = [];
-var data2 = [];
-var loadingMessage = document.getElementById( 'loadingMessage' );
-var startDate = 0;
-var endDate = 0;
-var n = 1; // number of layers
-var m = 57; // number of samples per layer;
-var barHeight = 10;
-var barWidth = 23;
-var margin = {top: 10, right: 10, bottom: 0, left: 10};
-var yArray;
-var svg;
-var layer;
-var rect;
-var texts;
-var texts2;
+var margin = { top: 40, right: 0, bottom: 20, left: 40 };
+var width = 1024 - margin.left - margin.right;
+var height = 1024 - margin.top - margin.bottom;
+var heightAdded = 150;
+var gridSize = Math.floor(width / 40); //42
+var maxAfDsPercentage = 70.20;
+var legendPercentageAdjust = maxAfDsPercentage/391.77;
+var legendElementWidth = gridSize + 1 ; 
+var colors = ["#dddddd", //White 0.00
+              "#FFFFCC", "#D9F7D4", "#B2F0DB", "#8CE8E3", "#66E0EB", "#40D9F2", "#19D1FA", 
+              "#15B2FB", "#1292FC", "#3D54ED", //Blue
+               "#473FCB", "#522AAA", "#5C1588", "#660066", //Red
+               "#520052", "#3D003D", "#240024", "#000000"];  // Purple 0.9 0.95 0.99
+var colorsLegend = [0,
+                    0.0001, 0.0003, 0.0004, 0.0005, 0.0007, 0.0009, 
+                    0.001, 0.002, 0.003, 0.004, 0.05, 0.07, 0.09,
+                    0.1, 0.2, 0.6, 0.7, 0.8, 0.9999];
+var colorText = ["Delete" , "", "", "Other", "", "", "Keep"];
+var max_Keep = 0;
 
 getData();
-
-//On change of SeletedDate-Dropdown, a message would load in loadingmessage and New data are feacthed from other php page
-//Then ask to update the database
-d3.select("#selectedDate_Start")
-    .on("change", function() {
-        getData();
-    });
-d3.select("#selectedDate_End")
-    .on("change", function() {
-        getData();
-    });
-d3.select("#sortBy")
-    .on("change", function() {
-        /* 
-        0-> Actual Occurrence
-        1-> No. of Participants
-        2-> Colour
-        */
-        if(eval(d3.select(this).property('value'))==0)
-            sortByActualOccurrence();
-        else if(eval(d3.select(this).property('value'))==1)
-            sortByNoOfParticipants();
-        else if(eval(d3.select(this).property('value'))==2)
-            sortByColour();
-    });
-
-    
+//http://www.w3schools.com/tags/ref_colormixer.asp
+//http://synthesis.sbecker.net/articles/2012/07/16/learning-d3-part-6-scales-colors
 function getData()
 {
-    startDate = eval(d3.select("#selectedDate_Start").property('value'));
-    endDate = eval(d3.select("#selectedDate_End").property('value'));
-    if(startDate <= endDate)
-    {
-        document.getElementById( 'loadingMessage' ).innerHTML = "Please wait, it is loading....";
-        data1 = [];
-        data2 = [];
-        d3.select("body")
-           .select(".sgvSection")
-           .select("svg").remove();
-        d3.select("#sortBy").property( "value", "0" ); 
-        d3.json("data2.php?startID="+startDate+"&endID="+endDate, function(error, data) {
-            //get the data from Database View PHP format
-            data.forEach(function(d){
-                data1.push({"x":d.id, "y":d.counter, "color": d.color});
-            });
+    giveData = [];  
+    d3.json("data1.php", function(error, data) {
+        //get the data from Database from PHP page
+        data.forEach(function(d){
+            d.average = ((+d.percentageOutcome_delete)*1 + (+d.percentageOutcome_other)*2 + (+d.percentageOutcome_keep)*3 ) /10000;
+            d.visualPercentage = (+d.percentageAfDs)/ 1792;
+            //if(+d.totalAFDs>0)
+                giveData.push(d);
+        });
         //load the data on the screen
         document.getElementById( 'loadingMessage' ).innerHTML = "&nbsp";
-        
-        var index=0;
-        data1.forEach(function(d){
-            index++;
-            if((index%4)==0)
-                data2.push(d);
-        });
-        
-        //refine based on the target output
-        data1 = new Array(data1);
-        data1 = new Array(data2);
         updateData();
-        });
-    }
+    });
 }
-    
+function isInArray(array, search)
+{
+    return array.indexOf(search) >= 0;
+}
+  
 function updateData()
 {
-    /* data1 = {[{"x": "1", "id": "1", "color": "2", "y": "2"}, 
-                {"z": "1", "id": "2", "color": "2", "y": "5"}, 
-                {"z": "1", "id": "3", "color": "2", "y": "6"}, 
-                {"z": "1", "id": "4",   "color": "2", "y": "5"}]}*/
-
-    //get the y attribute and set them a new array
-    // yArray = ["2", "5", "6", "5"];
+    max_Keep = d3.max(giveData.map(function(d) { return +d.totalComments_keep; }))
+    var column_keep_labelData = new Array();
+    for(var i=1; i<=max_Keep; i++)
+        column_keep_labelData.push(i.toString());
     
-    yArray = data1[0].map(function(d) { return +d.y; });
-    
-    //var maxDataHeight = Math.max.apply( Math, yArray ) * ( barHeight );
-    var maxDataHeight = d3.max(yArray) * ( barHeight );
-    var width = data1[0].length * barWidth;
-    var height = maxDataHeight  + 20;
-    if(width<900) width = 900;
-    
-    // set the height and width as well as the margins
-    
-    // First of All we need a contaioner to hole our svg
-    // Second append g mean append a group and adjust the group to the middle of screen
-    
-    svg = d3.select("body")
-            .select(".sgvSection")
-        .append("svg")
-            .attr("class", "shadow")
-            .attr("width", width + margin.left + margin.right + 30 )
-            .attr("height", height + margin.top + margin.bottom + 60)
-            .style("background-color","#EEE")
-            //.style("border", "1px solid #AAA")
-            .append("g")
-                .attr("transform", "translate(" + (margin.left+20) + "," + (margin.top+50) + ")");
-        
-    var xAxisScale = d3.scale.linear()
-                            .domain([0,yArray.length])
-                            .range([0,width]);
-    var yAxisScale = d3.scale.linear()
-                            .domain([0,d3.max(yArray) ])
-                            .range([0,height]);
-
-    var xAxis = d3.svg.axis()
-                            .scale(xAxisScale); 
-    var yAxis = d3.svg.axis()
-                            .scale(yAxisScale); 
-                            
-    var xAxisGroup = svg.append("g")
-                              .call(xAxis)
-                              .attr("transform", "translate(" + 0 + "," + (height-10) + ")");
-    
-    var yAxisGroup = svg.append("g")
-                              .call(yAxis)
-                              .attr("transform", "translate(" + (-7) + "," + (height-10) + ") rotate (-90)")
-                              .selectAll("text")
-                                    .attr("transform", "rotate(180)" );;
-       
-    // Select all layer 
-    // d in the function is refering to data
-    // i refering to the index
-    // for example is our data=[20,10,40] for the first item d=20 and i=0;
-    layer = svg.selectAll(".layer")
-        .data(data1)
-      .enter().append("g")
-        .attr("class", "layer")
-        .style("fill", "black");
-    
-    rect = layer.selectAll("rect")
-        .data(function(d) { return d; })
-      .enter().append("rect")
-        .attr("x", function(d,i) { return i*barWidth; })
-        .attr("y", maxDataHeight + 10 )
-        .attr("width", barWidth-2 )
-        .attr("height", 0 )
-        .style("fill", function(d) {
-            if(d.color == 1)        
-                return "green";
-            else if(d.color == 2)    
-                return "red"; 
-            else if (d.color == 3)   
-                return "yellow";
-            else    
-                return "black";
-        })
-        .style("stroke", "#000")
-        .style("stroke-width", "0px")
-        .attr("id", function(d, i) { return "rect_"+i;});
-                        
-    rect.transition()
-        .delay(function(d, i) { return i * 20; })
-        .attr("y", function(d) { return maxDataHeight - d.y * barHeight + 10; })
-        .attr("height", function(d) { return d.y * barHeight ; });
-   
-    
-    texts2 = layer.append("g")
-            .selectAll("text")
-            .data(function(d) { return d;})
-        .enter()
-            .append("text")
-            .style("font-weight","bold")
-            .attr("id", function(d, i) { return "text2_"+i;});
-            
-    texts2.transition()
-            .delay(function(d, i) { return i * 25; })
-            .attr("x", function(d,i) { return i*barWidth+7; })
-            .attr("y", function(d) { return maxDataHeight - (d.y * barHeight)/2 + 7; })
-            .text( function(d, i){ return d.x;})
-            .style("writing-mode", "tb");
-    
-    rect.on("mouseover", function(d,i) {
-            d3.select(this).style("fill", "#FFF")
-                            .style("stroke-width", "1px");
-        })
-        .on("mouseout",  function(d,i) {
-            d3.select(this).style("fill", function(d) {
-                if(d.color == 1)        
-                    return "green";
-                else if(d.color == 2)    
-                    return "red"; 
-                else if (d.color == 3)   
-                    return "yellow";
-                else    
-                    return "black";
-            }).style("stroke-width", "0px");
-        });
-}
-function sortByActualOccurrence() {
-        
-	rect.sort(function(a,b){
-	   return b.x-a.x;
-	});
-    sort_XAdjustment();
-}  
-function sortByNoOfParticipants() {
-        
-	rect.sort(function(a,b){
-	   if(a.y==b.y)
-            return a.color - b.color;
-	   return b.y-a.y;
-	});
-    sort_XAdjustment();
-} 
-function sortByColour(){
-    rect.sort(function(a,b){
-       if(a.color==b.color)
-            return b.y-a.y;
-	   return a.color - b.color;
-	});
-    sort_XAdjustment();
-}
-function sort_XAdjustment()
-{
-    rect.transition()
-    .delay(function (d, i) {
-        return i * 50;
-    })
-    .duration(500)
-    .attr("x", function(d,i) {
-        var initailID = d3.select(this).attr("id").substring(5);
-        d3.select("#text2_"+initailID).attr("x", function(d) { return i*barWidth+7; });
-        return i*barWidth;
+    row_delete_labelData = new Array();
+    giveData.forEach(function(d){
+        if(!isInArray(row_delete_labelData, d.totalComments_delete.toString()))
+            row_delete_labelData.push(d.totalComments_delete.toString());
     });
+    
+    //overwrite to height
+    height = row_delete_labelData.length * ( gridSize ) + margin.bottom ;
+    var width2 = row_delete_labelData.length * ( gridSize ) + margin.right ;
+     
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom )
+        .style("background-color","#eee")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    var rowLabels = svg.selectAll(".rowLabel")
+        .data(row_delete_labelData)
+        .enter().append("text")
+            .text(function (d) { return d; })
+            .attr("x", 0)
+            .attr("y", function (d, i) { return i * gridSize; })
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+            .attr("class", function (d, i) { return "rowLabel"; });
+    
+    var columnLabels = svg.selectAll(".columnLabel")
+        .data(column_keep_labelData)
+        .enter().append("text")
+            .text(function(d) { return d; })
+            .attr("x", function(d, i) { return i * gridSize; })
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+            .attr("class", function(d, i) { return "columnLabel"; });
+        
+    var afdsMap = svg.selectAll(".afd")
+        .data(giveData)
+        .enter().append("rect")
+            .attr("class", "afd bordered")
+            .attr("id", function (d){ return "rect_"+d.totalComments_delete+"_"+d.totalComments_keep })
+            .style("fill", colors[0])
+            .attr("rx", function (d){return 4;})
+            .attr("ry",  function (d){return 4;})
+            .attr("x", function(d) {return (+d.totalComments_keep-1) * gridSize ;})
+            .attr("y", function(d) {return (+d.totalComments_delete-1) * gridSize ; })
+            .attr("height", function (d){ return gridSize; })
+            .attr("width", function (d){return gridSize;});
+    
+    var colorScale = d3.scale.linear()
+        .domain(colorsLegend)
+        .range(colors);
+    
+    afdsMap.transition().duration(2000)
+        .style("fill", function(d) {
+            return colorScale(+d.visualPercentage); 
+        });
+    
+      afdsMap.append("title").text(function(d) { return  Math.round((+d.visualPercentage* maxAfDsPercentage*100).toFixed(2)) +" AfDs"; });
+                                        
+      var legend = svg.selectAll(".legend")
+          .data(colorsLegend)           
+          .enter().append("g")          
+          .attr("class", "legend");     
+      var legendY = 0 ;            
+      var legendX = width2  + gridSize - 20 ;                  
+                  
+                                        
+      /*legend.append("rect")             
+        .attr("x", legendX )  
+        .attr("y",  function(d, i) { return legendElementWidth * i + legendY; })          
+        .attr("width", legendElementWidth - 10 )
+        .attr("height", gridSize- 1)   
+        .style("fill", function(d, i) { 
+            return colorScale(+colorsLegend[i]); 
+        }); */
+        
+      var legendWidthScale = d3.scale.linear()
+        .domain([ 0, 1, 10, 7020])
+        .range([2, 4, 8, 280]);
+        
+      var legendXScale = d3.scale.linear()
+        .domain([ 0,    3,      4,       5,     14, 28, 350, 700, 1400, 7020])
+        .range([ -20,   -20,    -17,     -17,     -10 , -10 , 10,  25,  62,   277]);
+      
+      legend.append("text")             
+        .attr("class", "legendLabel") 
+        .attr("text-anchor", "end" )   
+        .text(function(d,i) {   return Math.round((colorsLegend[i]*100).toFixed(2)*maxAfDsPercentage) +" AfDs"; })
+        .attr("x",  function(d, i) {
+            return legendX +147+ legendXScale(+(Math.round((colorsLegend[i]*100).toFixed(2)*maxAfDsPercentage)));
+        })
+        .attr("y", function(d, i) { return - 2+legendElementWidth + legendElementWidth * i + legendY - (gridSize/3); });
+      
+      legend.append("text")             
+        .attr("class", "legendLabel")  
+        .text(function(d,i) {   if((colorsLegend[i]*100).toFixed(2)<60)
+                                    return "%0"+(colorsLegend[i]*100*legendPercentageAdjust).toFixed(3);
+                                else 
+                                    return "%"+(colorsLegend[i]*100*legendPercentageAdjust).toFixed(3); })
+        .attr("x", legendX + 20  )
+        .attr("y", function(d, i) { return - 2+legendElementWidth + legendElementWidth * i + legendY - (gridSize/3); });
+      
+      
+      legend.append("rect")             
+        .attr("x", legendX + 80 )  
+        .attr("y",  function(d, i) { return legendElementWidth * i + legendY ; })          
+        .attr("width", function(d, i) {
+            //if(i==0)
+            //    return 0;
+            return legendWidthScale(+(Math.round((colorsLegend[i]*100).toFixed(3)*maxAfDsPercentage)));
+        })
+        .attr("height", gridSize- 1)   
+        .style("fill", function(d, i) { 
+            return colorScale(+colorsLegend[i]); 
+        }); 
+       
+                                        
+      svg.append("text")                
+        .attr("class", "legendText")    
+        .text("The Number of AfDs")  // .text("Population  -->  Percentage")             
+        .attr("x", legendX + 20 )
+        .attr("y", legendY - 5  );    
+      
+      svg.append("text")                
+        .attr("class", "legendText")    
+        .text("Total Number of AfDs:")              
+        .attr("x", legendX + 18 )
+        .attr("y", legendY + 535  );
+        
+      svg.append("text")                
+        .attr("class", "legendText")    
+        .text("%100.00 = 39177 AfDs")              
+        .attr("x", legendX + 18 )
+        .attr("y", legendY + 550  );  
+                                         
+      svg.append("line")                
+        .attr("x1", 15 - margin.left)   
+        .attr("x2", 10 - margin.left + 50)
+        .attr("y1", 10 - margin.top )   
+        .attr("y2", 10 - margin.top)    
+        .attr("stroke", "green")        
+        .attr("stroke-width", "1");     
+                                        
+     var point1 = (10 - margin.left + 50)+","+ (10 - margin.top - 3);
+     var point2 = (10 - margin.left + 55)+","+ (10 - margin.top );
+     var point3 = (10 - margin.left + 50)+","+ (10 - margin.top + 3);
+     svg.append("polygon")              
+        .attr("points", point1 + " " + point2 + " " + point3 )
+        .style("fill", "green");        
+                                        
+     svg.append("text")                 
+        .text("The Number of Keep votes")             
+        .attr("x", margin.left - 10  )  
+        .attr("y", 10 - margin.top + 5);
+    
+    svg.append("line")
+        .attr("x1", 15 - margin.left)
+        .attr("x2", 15 - margin.left)
+        .attr("y1", 9 - margin.top )
+        .attr("y2", 10 - margin.top  + 50)
+        .attr("stroke", "red")
+        .attr("stroke-width", "1");
+        
+     var point1 = (15 - margin.left - 3)+","+ (10 - margin.top  + 50 );
+     var point2 = (15 - margin.left    )+","+ (10 - margin.top  + 55 );
+     var point3 = (15 - margin.left + 3)+","+ (10 - margin.top  + 50);
+     svg.append("polygon")
+        .attr("points", point1 + " " + point2 + " " + point3 )
+        .style("fill", "red");
+    
+     svg.append("text")
+        .style("writing-mode", "tb")
+        .text("The Number of Delete votes")
+        .attr("x", 15 - margin.left   )
+        .attr("y", 10 - margin.top  + 60 );
+
 }
