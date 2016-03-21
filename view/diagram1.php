@@ -65,6 +65,6 @@
     <h3 id="loadingMessage" >Please wait, it is loading....</h3>
     <div id="chart"></div>
     <!-- Note this is important that D3 script be in the body section !-->
-    <script src="diagram1.js"></script>
+    <script src="diagram1.js?ver=14"></script>
     </body>
 </html>

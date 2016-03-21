@@ -470,7 +470,7 @@ var percentageScale = d3.scale.linear()
 function colorCodeOfPath()
 {
     var startX = baseX - 52 ;
-    var startY = circleCenter.y -10 - 65;
+    var startY = circleCenter.y - 90;
     var strokeColor = "rgb(136, 136, 136)";
     var distance2 = 20;
     
@@ -599,7 +599,7 @@ function displayBarChar(d)
     
     
     //Title Section
-    vis.selectAll(".barChartShortCut").remove();
+    /*vis.selectAll(".barChartShortCut").remove();
     vis.selectAll(".barChartShortCut")
                 .data(rectData)
                 .enter()
@@ -617,7 +617,7 @@ function displayBarChar(d)
                 .attr("y", function(d, i ) {return baseYLabel + distance*i + 20; })
                 .attr("height", function (d){ return 1; })
                 .attr("width", function (d){ return heightRec * 16; })
-                .style("opacity", opacityTextBackground); 
+                .style("opacity", opacityTextBackground); */
     vis.selectAll(".barChartTextLabel").remove();
     vis.selectAll(".barChartTextLabel")
                   .data(rectData)
@@ -630,9 +630,9 @@ function displayBarChar(d)
                   .style("cursor", "pointer")
                   .attr("dy", "0.45em")
                   .attr("text-anchor", "left")
-                  .attr("x", function(d, i ) {return baseX - 52 ;})
-                  .attr("y", function(d, i ) {return baseYLabel + 10 + distance*i; })
-                  .text(function(d) { return "Policy Title: "+ d.policyTitle ;  });  
+                  .attr("x", function(d, i ) {return baseX  ;})
+                  .attr("y", function(d, i ) {return baseYLabel + 15 + distance*i; })
+                  .text(function(d) { return d.policyTitle ;  });  
                   
     //Shortcut Section              
     vis.selectAll(".barChartTitle").remove();

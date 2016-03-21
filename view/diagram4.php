@@ -18,6 +18,6 @@
         </div>
       </div>
     </div>
-    <script type="text/javascript" src="diagram4.js"></script>
+    <script type="text/javascript" src="diagram4.js?ver=10"></script>
   </body>
 </html>

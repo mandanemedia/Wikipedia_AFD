@@ -8,7 +8,7 @@ var colorsLegend = [1, 1.33, 1.66, 2, 2.33, 2.66, 3];
 var colorText = ["Delete" , "", "", "", "", "", "Keep"];
 var max_Keep = 0;
 var legendY ;
-
+var svg;
 getData();
 
 //http://synthesis.sbecker.net/articles/2012/07/16/learning-d3-part-6-scales-colors
@@ -190,10 +190,9 @@ function updateData()
         .text("The Number of Delete votes")
         .attr("x", 15 - margin.left   )
         .attr("y", 10 - margin.top  + 60 );
-
+    
+     getExtraData();
 }
-
-
 
 //Start Of second Section
 var deleteLayer =[];
@@ -216,8 +215,8 @@ var width_2 = barchartWidth - margin.left - margin.right,
     height_2 = barchartHeight - margin.top - margin.bottom;
 
 var checkGrouped = true;
-
-d3.json("data1_1.php", function(error, data) {
+function getExtraData() {
+    d3.json("data1_1.php", function(error, data) {
             data.forEach(function(d,i){
                     deleteLayer.push({"x":+d.x, "y":+d.y, "y0":0});
                     y0[i] = +d.y;
@@ -396,7 +395,7 @@ d3.json("data1_1.php", function(error, data) {
                 .attr("stroke-width", "1");
                 
             svg.append("text")
-                .text("The Number of Votes ")
+                .text("The Length of AfDs ")
                 .attr("x", bar1Shiftx - 178 )
                 .attr("y", bar1Shifty +4 );
                 
@@ -433,8 +432,16 @@ d3.json("data1_1.php", function(error, data) {
                 .attr("class", "legendText")    
                 .text("Outcome:")              
                 .attr("x", bar1Shiftx   - legendElementWidth - legendElementWidth - 52)
-                .attr("y", legendY + 10  );  
-  });
+                .attr("y", legendY + 10  );
+                
+            svg.append("text")                
+            .attr("class", "legendText")    
+            .text("Total Number of AfDs = 39K")              
+            .attr("x", bar1Shiftx   - legendElementWidth - legendElementWidth - 260 )
+            .attr("y", legendY + 10   );
+              
+        });
+}
 
 
 function change() {
