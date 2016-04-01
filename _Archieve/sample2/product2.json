@@ -1,0 +1,106 @@
+[
+    {
+        "name": "Total",
+        "id": "final_score"
+    },
+    {
+        "name": "Environment",
+        "id": "environment_score"
+    },
+    {
+        "name": "Land use",
+        "id": "land_use_score"
+    },
+    {
+        "id": "research_ingredient_177",
+        "name": "Cocoa butter (Organic)"
+    },
+    {
+        "name": "Cocoa mass (Organic)",
+        "id": "research_ingredient_190"
+    },
+    {
+        "name": "Hazelnuts (Organic)",
+        "id": "research_ingredient_228"
+    },
+    {
+        "name": "Cane sugar (Organic)",
+        "id": "research_ingredient_283"
+    },
+    {
+        "name": "Vegetables (Organic)",
+        "id": "research_ingredient_272"
+    },
+    {
+        "name": "Climate change",
+        "id": "climate_change_score"
+    },
+    {
+        "id": "harmful_substances_score",
+        "name": "Harmful substances"
+    },
+    {
+        "name": "Water use ",
+        "id": "water_use_score"
+    },
+    {
+        "id": "resource_depletion_score",
+        "name": "Resource depletion"
+    },
+    {
+        "name": "Refrigeration",
+        "id": "refrigeration_score"
+    },
+    {
+        "name": "Packaging",
+        "id": "package_score"
+    },
+    {
+        "id": "social_score",
+        "name": "Human rights"
+    },
+    {
+        "name": "Child labour",
+        "id": "child_score"
+    },
+    {
+        "id": "research_ingredient_238",
+        "name": "Coconut oil (Organic)"
+    },
+    {
+        "id": "forced_score",
+        "name": "Forced labour"
+    },
+    {
+        "id": "health_safety_score",
+        "name": "Health safety"
+    },
+    {
+        "name": "Access to water",
+        "id": "water_score"
+    },
+    {
+        "id": "association_score",
+        "name": "Freedom of association"
+    },
+    {
+        "id": "land_score",
+        "name": "Access to land"
+    },
+    {
+        "id": "wage_score",
+        "name": "Sufficient wage"
+    },
+    {
+        "name": "Equal rights migrants",
+        "id": "migrant_score"
+    },
+    {
+        "id": "discrimination_score",
+        "name": "Discrimination"
+    },
+    {
+        "id": "hours_score",
+        "name": "Working hours"
+    }
+]

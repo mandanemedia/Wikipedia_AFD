@@ -1,0 +1,282 @@
+{
+  "nodes": [
+    {
+      "name": "Academic",
+      "id": "1"
+    },
+    {
+      "name": "Arts",
+      "id": "2"
+    },
+    {
+      "name": "Continent",
+      "id": "3"
+    },
+    {
+      "name": "Country",
+      "id": "4"
+    },
+    {
+      "name": "Culture",
+      "id": "5"
+    },
+    {
+      "name": "Fiction",
+      "id": "6"
+    },
+    {
+      "name": "Film",
+      "id": "7"
+    },
+    {
+      "name": "Games",
+      "id": "8"
+    },
+    {
+      "name": "General",
+      "id": "9"
+    },
+    {
+      "name": "Health_and_fitness",
+      "id": "10"
+    },
+    {
+      "name": "Lists",
+      "id": "11"
+    },
+    {
+      "name": "Media",
+      "id": "12"
+    },
+    {
+      "name": "Military",
+      "id": "13"
+    },
+    {
+      "name": "Music",
+      "id": "14"
+    },
+    {
+      "name": "People",
+      "id": "15"
+    },
+    {
+      "name": "Region",
+      "id": "16"
+    },
+    {
+      "name": "Religion",
+      "id": "17"
+    },
+    {
+      "name": "Research",
+      "id": "18"
+    },
+    {
+      "name": "Science",
+      "id": "19"
+    },
+    {
+      "name": "Society",
+      "id": "20"
+    },
+    {
+      "name": "Sports",
+      "id": "21"
+    },
+    {
+      "name": "Technology",
+      "id": "22"
+    },
+    {
+      "name": "Transport",
+      "id": "23"
+    },
+    {
+      "name": "Visual_arts",
+      "id": "24"
+    },
+    {
+      "name": "Wikipedia:42",
+      "id": "100"
+    },
+    {
+      "name": "Wikipedia:5P1",
+      "id": "101"
+    },
+    {
+      "name": "Wikipedia:AADD",
+      "id": "102"
+    },
+    {
+      "name": "Wikipedia:AB\r\n",
+      "id": "103"
+    },
+    {
+      "name": "Wikipedia:AB",
+      "id": "104"
+    },
+    {
+      "name": "Wikipedia:ADD",
+      "id": "105"
+    },
+    {
+      "name": "Wikipedia:ADMIN",
+      "id": "106"
+    },
+    {
+      "name": "Wikipedia:Administrators%27_noticeboard",
+      "id": "107"
+    },
+    {
+      "name": "Wikipedia:ADVOCACY",
+      "id": "108"
+    },
+    {
+      "name": "Wikipedia:AFC",
+      "id": "109"
+    },
+    {
+      "name": "Wikipedia:AFD",
+      "id": "110"
+    },
+    {
+      "name": "Wikipedia:ALIVE",
+      "id": "111"
+    },
+    {
+      "name": "Wikipedia:AS",
+      "id": "112"
+    },
+    {
+      "name": "Wikipedia:ATATP",
+      "id": "113"
+    },
+    {
+      "name": "Wikipedia:ATH",
+      "id": "114"
+    },
+    {
+      "name": "Wikipedia:ATTACK",
+      "id": "115"
+    },
+    {
+      "name": "Wikipedia:AUSMUSIC",
+      "id": "116"
+    },
+    {
+      "name": "Wikipedia:AV",
+      "id": "117"
+    },
+    {
+      "name": "Wikipedia:B2B",
+      "id": "118"
+    },
+    {
+      "name": "Wikipedia:BAN",
+      "id": "119"
+    },
+    {
+      "name": "Wikipedia:BARE",
+      "id": "120"
+    },
+    {
+      "name": "Wikipedia:BB",
+      "id": "121"
+    },
+    {
+      "name": "Wikipedia:BIAS",
+      "id": "122"
+    },
+    {
+      "name": "Wikipedia:BIO",
+      "id": "123"
+    },
+    {
+      "name": "Wikipedia:BITE",
+      "id": "124"
+    },
+    {
+      "name": "Wikipedia:BK",
+      "id": "125"
+    },
+    {
+      "name": "Wikipedia:BLPPROD",
+      "id": "126"
+    },
+    {
+      "name": "Wikipedia:BOMBARD",
+      "id": "127"
+    },
+    {
+      "name": "Wikipedia:BOOK",
+      "id": "128"
+    },
+    {
+      "name": "Wikipedia:XFD",
+      "id": "129"
+    }
+  ],
+  "links": [
+    {
+      "source": "0",
+      "value": "11",
+      "target": "22"
+    },
+    {
+      "source": "0",
+      "value": "11",
+      "target": "22"
+    },
+    {
+      "source": "0",
+      "value": "19",
+      "target": "22"
+    },
+    {
+      "source": "0",
+      "value": "17",
+      "target": "22"
+    },
+    {
+      "source": "0",
+      "value": "16",
+      "target": "23"
+    },
+    {
+      "source": "0",
+      "value": "16",
+      "target": "23"
+    },
+    {
+      "source": "0",
+      "value": "13",
+      "target": "21"
+    },
+    {
+      "source": "0",
+      "value": "11",
+      "target": "21"
+    },
+    {
+      "source": "0",
+      "value": "11",
+      "target": "21"
+    },
+    {
+      "source": "0",
+      "value": "11",
+      "target": "22"
+    },
+    {
+      "source": "0",
+      "value": "9",
+      "target": "25"
+    },
+    {
+      "source": "0",
+      "value": "8",
+      "target": "26"
+    }
+  ]
+}
