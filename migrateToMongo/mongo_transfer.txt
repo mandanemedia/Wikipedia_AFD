@@ -1,0 +1,102 @@
+
+// Remove nomination from afds
+db.afds.update({
+    "nomination": {$exists: true}
+ }, {$unset: {
+       "nomination" : true
+     }},false, true
+);
+
+
+// Remove a filed in subfiled from afds
+db.afdstest.update({
+    "comment.commentTypeDetail": {$exists: true}
+ }, {$unset: {
+       "comment.$.commentTypeDetail" : true
+     }},false, true
+);
+
+
+// Remove a filed in array subfiled from afdstest
+db.afds.find({
+    "comment.commentTypeDetail": {$exists: true}
+    }).forEach(function(doc) {
+    var comment = doc.comment;
+    for(var i = 0; i < comment.length; ++i) {
+        var x = comment[i];
+        delete (x["commentID"]);
+    }
+    db.afds.save(doc);
+});
+
+// Remove a filed in array subfiled from afdstest
+db.afds.find({}).forEach(function(doc) {
+    var comment = doc.comment;
+    for(var i = 0; i < comment.length; ++i) {
+        var x = comment[i];
+        delete (x["commentCategory"]);
+    }
+    db.afds.save(doc);
+});
+
+
+// Add a filed to array in the subfiled array
+db.afds.update(
+	{AFDID": "1", "comment.commentID_auto": 101},
+	{'$push: { "comment.$.policy": {"pID":"2", "policyLabel": "Notability"} } }
+);
+
+
+//Testing 1
+db.afds.find(
+    {},
+    { "AFDID": 1,
+      "category":1,
+      "comment.commentID_auto": 1,
+      "comment.policy": 1}
+);
+
+//Testing 2
+db.afds.aggregate(
+     {$project:
+         { "AFDID": 1,
+          "category":1,
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1}},
+     {$unwind:"$category"}, 
+     {$unwind:"$comment"},
+     {$project : {
+            "AFDID": "$AFDID",
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "category": "$category.afd_catLabel",
+         }
+     },
+     {$unwind:"$policy"}
+);
+
+
+//Testing 2 - get total
+db.afds.aggregate(
+     {$project: { "AFDID": 1,
+          "category":1,
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1
+          }
+     },
+     {$unwind:"$category"}, 
+     {$unwind:"$comment"},
+     {$project : {
+            "AFDID": "$AFDID",
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "category": "$category.afd_catLabel",
+         }
+     },
+     {$unwind:"$policy"},
+     {$group: {
+           _id: null, 
+           totalAmount: { $sum: 1 }
+         }
+     }
+);
