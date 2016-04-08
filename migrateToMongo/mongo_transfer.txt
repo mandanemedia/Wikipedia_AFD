@@ -56,7 +56,7 @@ db.afds.find(
       "comment.policy": 1}
 );
 
-//Testing 2
+//Testing A
 db.afds.aggregate(
      {$project:
          { "AFDID": 1,
@@ -76,7 +76,7 @@ db.afds.aggregate(
 );
 
 
-//Testing 2 - get total
+//Testing A - get total
 db.afds.aggregate(
      {$project: { "AFDID": 1,
           "category":1,
@@ -100,3 +100,274 @@ db.afds.aggregate(
          }
      }
 );
+
+//Testing B
+db.afds.aggregate(
+     db.afds.aggregate(
+     {$project: { "AFDID": 1,
+          "category":1,
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1
+          }
+     },
+     {$unwind:"$category"},      
+     {$unwind:"$comment"},
+     {$project : {
+            "AFDID": "$AFDID",
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "category": "$category.afd_catLabel",          
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }},
+     {$project : {            
+            "AFDID": 1,
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "category": 1,
+            "parentPolicyID": "$parentPolicy.parentPolicyID"           
+         }                                                   
+     },                   
+     {$unwind:"$parentPolicyID"} 
+);
+
+//Testing C 
+db.afds.aggregate(
+     {$project: { "AFDID": 1,
+          "category":1,
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1
+          }
+     },
+     {$unwind:"$category"},      
+     {$unwind:"$comment"},
+     {$project : {
+            "AFDID": "$AFDID",
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "category": "$category.afd_catLabel",          
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }},   
+     {$project : {            
+            "AFDID": 1,
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "category": 1,
+            "parentPolicyID": "$parentPolicy.parentPolicyID"           
+         }                                                   
+     },  
+     {$unwind:"$parentPolicyID"},            
+     {$lookup:{
+            from: "categories", 
+            localField: "category",  
+            foreignField: "categories.categoryLabel",
+            as: "parentCategory"  
+     }},
+     {$project : {            
+            "AFDID": 1,
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "category": 1,
+            "parentCategoryLabel": "$parentCategory.parentCategoryLabel"           
+         }                                                   
+     },  
+     {$unwind:"$parentCategoryLabel"}
+);  
+
+//Testing D
+db.afds.aggregate(
+     {$project: { "AFDID": 1,
+          "category":1,
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1
+          }
+     },
+     {$unwind:"$category"},      
+     {$unwind:"$comment"},
+     {$project : {
+            "AFDID": "$AFDID",
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "category": "$category.afd_catLabel",          
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }}, 
+     {$project : {            
+            "AFDID": 1,
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "category": 1,
+            "parentPolicyID": "$parentPolicy.parentPolicyID", 
+            "policyFamily": "$parentPolicy.policyFamily"          
+         }                                                   
+     },
+     {$unwind:"$parentPolicyID"},
+     {$unwind:"$policyFamily"},
+     {$lookup:{
+            from: "categories", 
+            localField: "category",  
+            foreignField: "categories.categoryLabel",
+            as: "parentCategory"  
+     }}, 
+     {$project : {            
+            "AFDID": 1,
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "category": 1,  
+            "parentPolicyID": 1,
+            "policyFamily": 1,
+            "parentCategoryLabel": "$parentCategory.parentCategoryLabel",  
+            "categoryFamily": "$parentCategory.categoryFamily",        
+         }                                                   
+     },
+     {$unwind:"$parentCategoryLabel"},
+     {$unwind:"$categoryFamily"}  
+);    
+
+
+//Testing E
+db.afds.aggregate(
+     {$project: { 
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1
+          }
+     },      
+     {$unwind:"$comment"},
+     {$project : {
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel"
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }}, 
+     {$project : {       
+            "commentID_auto": 1,
+            "policy" : 1,  
+            "parentPolicyID": "$parentPolicy.parentPolicyID"      
+         }                                                   
+     },
+     {$unwind:"$parentPolicyID"}
+);    
+
+//Testing F
+db.afds.aggregate(
+     {$project: { 
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1,
+          "comment.commentUser": 1
+          }
+     },      
+     {$unwind:"$comment"},
+     {$project : {
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "commentUser" : "$comment.commentUser"
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }}, 
+     {$project : {       
+            "commentID_auto": 1,
+            "commentUser" : 1,
+            "policy" : 1, 
+            "parentPolicyID": "$parentPolicy.parentPolicyID"      
+         }                                                   
+     },
+     {$unwind:"$parentPolicyID"},
+     {$lookup:{
+            from: "users", 
+            localField: "commentUser",
+            foreignField: "userID",
+            as: "user"
+     }}, 
+     {$project : {       
+            "commentID_auto": 1,
+            "commentUser" : 1,
+            "policy" : 1, 
+            "parentPolicyID": 1,
+            "userTitle": "$user.userTitle" 
+         }                                                   
+     },
+     {$unwind:"$userTitle"}
+);          
+
+//Testing H     
+db.afds.aggregate(
+     {$project: { 
+          "comment.commentID_auto": 1,
+          "comment.policy.comment_policyLabel": 1,
+          "comment.commentUser": 1,
+          "category.afd_catLabel": 1
+          }
+     },      
+     {$unwind:"$comment"},
+     {$unwind:"$category"},
+     {$project : {
+            "commentID_auto": "$comment.commentID_auto",
+            "policy" : "$comment.policy.comment_policyLabel",
+            "commentUser" : "$comment.commentUser",
+            "afd_catLabel" : "$category.afd_catLabel"
+         }        
+     },
+     {$unwind:"$policy"},
+     {$lookup:{
+            from: "policies", 
+            localField: "policy",
+            foreignField: "policies.policyID",
+            as: "parentPolicy"
+     }}, 
+     {$project : {       
+            "commentID_auto": 1,
+            "commentUser" : 1,
+            "policy" : 1, 
+            "afd_catLabel" : 1,
+            "parentPolicyID": "$parentPolicy.parentPolicyID"      
+         }                                                   
+     },
+     {$unwind:"$parentPolicyID"},
+     {$lookup:{
+            from: "users", 
+            localField: "commentUser",
+            foreignField: "userID",
+            as: "user"
+     }}, 
+     {$project : {       
+            "commentID_auto": 1,
+            "commentUser" : 1,
+            "policy" : 1, 
+            "parentPolicyID": 1,
+            "afd_catLabel" : 1,
+            "userTitle": "$user.userTitle" 
+         }                                                   
+     },
+     {$unwind:"$userTitle"}
+);                                                                                                                                                                                                                                                                                                                                                                                                                                             
