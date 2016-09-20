@@ -1,4 +1,5 @@
-!function(){
+var mamali;
+!function () {
 	var bP={};	
 	var b=30, bb=300, height=570, buffMargin=1, minHeight=14;
 	var c1=[-120, 90], c2=[-20, 35], c3=[-20, 80], c4=[-120, 360]; //Column positions of labels.
@@ -10,22 +11,39 @@
 		givenData = data;
         //console.log(givenData)
 		sData.keys=[
-			d3.set(data.map(function(d){ return d[0];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
-			d3.set(data.map(function(d){ return d[1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
+			d3.set(data.map(function (d) {
+			    return d[0];
+			}))
+                .values()
+                .sort(function (a, b) {
+                    return (a < b ? -1 : a > b ? 1 : 0);
+                }),
+			d3.set(data.map(function (d) {
+			    return d[1];
+			}))
+                .values()
+                .sort(function (a, b) {
+                    return (a < b ? -1 : a > b ? 1 : 0);
+                })
 		];
 		
-		sData.data = [	sData.keys[0].map( function(d){ return sData.keys[1].map( function(v){ return 0; }); }),
-						sData.keys[1].map( function(d){ return sData.keys[0].map( function(v){ return 0; }); }) 
+		sData.data = [
+            sData.keys[0].map(function (d) {
+                return sData.keys[1].map(function (v) { return 0; });
+            }),
+            sData.keys[1].map(function (d) {
+                return sData.keys[0].map(function (v) { return 0; });
+            })
 		];
-		data.forEach(function(d){ 
-			sData.data[0][sData.keys[0].indexOf(d[0])][sData.keys[1].indexOf(d[1])]=d[p];
-			sData.data[1][sData.keys[1].indexOf(d[1])][sData.keys[0].indexOf(d[0])]=d[p]; 
+		data.forEach(function (d) {
+			sData.data[0][sData.keys[0].indexOf(d[0])][sData.keys[1].indexOf(d[1])]=d[2];
+			sData.data[1][sData.keys[1].indexOf(d[1])][sData.keys[0].indexOf(d[0])]=d[2]; 
 		});
-		
+		mamali = sData;
 		return sData;
 	}
 	
-	function visualize(data){
+	function visualize(data) {
 		var vis ={};
 		function calculatePosition(a, s, e, b, m){
 			var total=d3.sum(a);
