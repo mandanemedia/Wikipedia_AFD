@@ -1,4 +1,3 @@
-var mamali;
 !function () {
 	var bP={};	
 	var b=30, bb=300, height=570, buffMargin=1, minHeight=14;
@@ -39,7 +38,6 @@ var mamali;
 			sData.data[0][sData.keys[0].indexOf(d[0])][sData.keys[1].indexOf(d[1])]=d[2];
 			sData.data[1][sData.keys[1].indexOf(d[1])][sData.keys[0].indexOf(d[0])]=d[2]; 
 		});
-		mamali = sData;
 		return sData;
 	}
 	
